@@ -1,8 +1,8 @@
 
 Timer=love.timer
 Gfx=love.graphics
-Sfx=love.sound
-Physics=love.physics
+Sfx=love.audio
+Phys=love.physics
 
 HID={
 	Mouse=love.mouse,
