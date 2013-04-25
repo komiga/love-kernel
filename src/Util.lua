@@ -1,12 +1,16 @@
 
 module("Util", package.seeall)
 
+require("src/State")
+
 --local M_lrandom=require("random")
 
---local rng=nil
+local data={
+	--rng=nil
+}
 
 function init()
-	--rng=M_lrandom.new(os.time())
+	--data.rng=M_lrandom.new(os.time())
 	math.randomseed(os.time())
 end
 
@@ -46,8 +50,14 @@ function last(table)
 	return table[#table]
 end
 
+function debug(msg, ...)
+	if true==State.debug_mode then
+		print("debug: "..msg, ...)
+	end
+end
+
 function random(x, y)
-	--return rng:value(x, y)
+	--return data.rng:value(x, y)
 	return math.random(x, y)
 end
 

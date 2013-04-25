@@ -23,6 +23,17 @@ binds={
 			State.paused=State.pause_lock
 		end
 	},
+	["f4"]={
+		kind=Bind.Kind.RELEASE,
+		handler=function(_, _)
+			State.debug_mode=not State.debug_mode
+			if State.debug_mode then
+				print("debug mode enabled")
+			else
+				print("debug mode disabled")
+			end
+		end
+	},
 	[{" ", "mouse1"}]={
 		kind=Bind.Kind.RELEASE,
 		handler=function(_, _)
