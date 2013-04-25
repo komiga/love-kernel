@@ -27,6 +27,7 @@ local MouseButton={
 }
 
 local data={
+	__initialized=false,
 	binds=nil,
 	gate_fn=nil,
 	active=nil
@@ -71,6 +72,8 @@ local function bind_release(ident)
 	end
 end
 
+-- Bind interface
+
 function init(bind_table, gate_fn)
 	Util.tcheck(bind_table, "table")
 	Util.tcheck(gate_fn, "function")
@@ -95,6 +98,8 @@ function init(bind_table, gate_fn)
 	for ident, bind in pairs(expanded) do
 		data.binds[ident]=bind
 	end
+
+	data.__initialized=true
 end
 
 function is_active(native)
