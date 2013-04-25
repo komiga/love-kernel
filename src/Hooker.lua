@@ -25,7 +25,7 @@ function Hooklet:__init(props, x, y)
 		self.props.duration,
 		self.fields,
 		self.props.trans,
-		true
+		FieldAnimator.Mode.Stop
 	)
 end
 

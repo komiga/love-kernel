@@ -61,13 +61,22 @@ function init(_)
 
 	Core.moving_square=FieldAnimator.new(
 		8*0.05, -- 50ms/frame
-		{s1=1, s2=2},
 		{
-			["frame"]={
+			s1=1, s2=2, frame=1,
+			update=function(value, fanim)
+				fanim.fields.frame=math.floor(value)
+			end
+		},
+		{
+			["update"]={
 				{1, 8}
 			}
 		},
-		true
+		FieldAnimator.Mode.Wrap,
+		function(fanim)
+			fanim.fields.s1, fanim.fields.s2=
+			fanim.fields.s2, fanim.fields.s1
+		end
 	)
 end
 
@@ -90,12 +99,7 @@ function update(dt)
 		Bind.update(dt)
 		Hooker.update(dt)
 
-		local f=Core.moving_square
-		if f:update(dt) then
-			f:reset()
-			f.fields.s1, f.fields.s2=
-			f.fields.s2, f.fields.s1
-		end
+		Core.moving_square:update(dt)
 	end
 end
 
@@ -116,19 +120,19 @@ function render()
 	a=Asset.anim.moving_square
 	t=a.__texture
 	Gfx.drawq(
-		t, a.set[f.fields.s1][math.floor(f.fields.frame)],
+		t, a.set[f.fields.s1][f.fields.frame],
 		32,32
 	)
 	Gfx.drawq(
-		t, a.set[f.fields.s2][math.floor(f.fields.frame)],
+		t, a.set[f.fields.s2][f.fields.frame],
 		32,64
 	)
 	Gfx.drawq(
-		t, a.set[f.fields.s1][math.floor(f.fields.frame)],
+		t, a.set[f.fields.s1][f.fields.frame],
 		64,64
 	)
 	Gfx.drawq(
-		t, a.set[f.fields.s2][math.floor(f.fields.frame)],
+		t, a.set[f.fields.s2][f.fields.frame],
 		64,32
 	)
 end
