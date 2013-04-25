@@ -1,18 +1,19 @@
 
 module("Asset", package.seeall)
 
-require("src/Bind")
+require("src/AudioManager")
 require("src/FieldAnimator")
 require("src/Hooker")
-require("src/AssetLoader")
 
-function load(root_path)
-	AssetLoader.load(root_path, Asset.desc_root, Asset)
-end
+InstancePolicy=AudioManager.InstancePolicy
 
 -- assets
 
 desc_root={
+
+font={
+	main={nil, 18}
+},
 
 atlas={
 	sprites={
@@ -39,8 +40,12 @@ anim={
 	}
 },
 
-font={
-	main={nil, 18}
+sound={
+	waaauu={
+		"@.ogg",
+		InstancePolicy.Reserve,
+		limit=2
+	}
 }
 
 }

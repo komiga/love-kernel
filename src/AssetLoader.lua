@@ -2,6 +2,7 @@
 module("AssetLoader", package.seeall)
 
 require("src/Util")
+require("src/AudioManager")
 
 local function fix_path(path, name)
 	return string.gsub(path, "@", name)
@@ -11,7 +12,7 @@ local Kind={}
 
 --[[
 
-'@' in descriptor paths will be replaced with the name of the asset.
+NOTE: '@' in descriptor paths will be replaced with the name of the asset.
 
 ]]
 
@@ -229,10 +230,62 @@ Kind.anim={
 	end
 }
 
+--[[
+
+With path, instance policy, and instance limit:
+
+	name={
+		"@.ext",
+		InstancePolicy.Constant,
+		limit=10
+	}
+
+'limit' is 0 by default.
+
+The second parameter is the instance policy. This is defaulted to
+Constant if limit>0, or Immediate if limit<=0.
+
+--]]
+Kind.sound={
+	slug="sound/",
+	loader=function(root_path, name, desc)
+		local path=desc[1]
+		local policy=desc[2]
+		local limit=desc.limit
+		Util.tcheck(path, "string")
+		Util.tcheck(policy, "number", true)
+		Util.tcheck(limit, "number", true)
+
+		limit=Util.optional(limit, 0)
+		policy=Util.optional(
+			policy,
+			Util.ternary(
+				0<limit,
+				AudioManager.InstancePolicy.Constant,
+				AudioManager.InstancePolicy.Immediate
+			)
+		)
+		if AudioManager.InstancePolicy.Constant==policy and 0==limit then
+			error("policy cannot be Constant when limit=0")
+		end
+
+		local sound={
+			data=love.sound.newSoundData(
+				root_path..fix_path(path, name)
+			),
+			policy=policy,
+			limit=limit
+		}
+
+		return sound
+	end
+}
+
 local LoadOrder={
 	"font",
 	"atlas",
-	"anim"
+	"anim",
+	"sound"
 }
 
 local function load_kind(root_path, kind_name, desc_table, asset_table)

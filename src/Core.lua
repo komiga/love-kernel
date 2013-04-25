@@ -1,12 +1,14 @@
 
 module("Core", package.seeall)
 
+require("src/State")
 require("src/Util")
 require("src/Bind")
+require("src/AudioManager")
 require("src/FieldAnimator")
 require("src/Hooker")
+require("src/AssetLoader")
 require("src/Asset")
-require("src/State")
 
 binds={
 	["escape"]={
@@ -21,6 +23,11 @@ binds={
 		handler=function(_, _)
 			State.pause_lock=not State.pause_lock
 			State.paused=State.pause_lock
+			if State.paused then
+				AudioManager:pause()
+			else
+				AudioManager:resume()
+			end
 		end
 	},
 	["f4"]={
@@ -37,6 +44,7 @@ binds={
 	[{" ", "mouse1"}]={
 		kind=Bind.Kind.RELEASE,
 		handler=function(_, _)
+			AudioManager.spawn(Asset.sound.waaauu)
 			Hooker.spawn(
 				Asset.hooklets.KUMQUAT,
 				HID.Mouse.getX(),
@@ -62,10 +70,12 @@ function init(_)
 	Bind.init(Core.binds, Core.bind_trigger_gate)
 
 	-- assets
-	Asset.load("asset/")
+	AssetLoader.load("asset/", Asset.desc_root, Asset)
 	Hooker.init(Asset.hooklets, Asset.font.main)
 
-	-- default state
+	AudioManager.init(Asset.sound)
+
+	-- default rendering state
 	Gfx.setFont(Asset.font.main)
 	Gfx.setColor(255,255,255, 255)
 	Gfx.setBackgroundColor(0,0,0, 255)
@@ -109,6 +119,7 @@ function update(dt)
 	else
 		Bind.update(dt)
 		Hooker.update(dt)
+		AudioManager:update(dt)
 
 		Core.moving_square:update(dt)
 	end
