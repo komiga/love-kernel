@@ -1,7 +1,7 @@
 
 module("AssetLoader", package.seeall)
 
-require("Util")
+require("src/Util")
 
 local function fix_path(path, name)
 	return string.gsub(path, "@", name)
