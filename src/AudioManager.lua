@@ -36,8 +36,12 @@ function SoundInstance:play()
 	self.source:play()
 end
 
-function SoundInstance:update(_)
+function SoundInstance:is_playing()
 	return not self.source:isStopped()
+end
+
+function SoundInstance:update(_)
+	return self:is_playing()
 end
 
 -- class Bucket
@@ -66,7 +70,6 @@ function Bucket:__init(sound)
 			table.insert(self.free, SoundInstance.new(sound, 0.0, 0.0, 0.0))
 		end
 		self.count=self.sound.limit
-		print("#free: "..#self.free)
 	end
 end
 
@@ -93,17 +96,20 @@ function Bucket:update(dt)
 	if 0<#self.active then
 		for i, inst in pairs(self.active) do
 			if not inst:update(dt) then
-				Util.debug("SoundInstance finished: "..i)
+				Util.debug(
+					"SoundInstance finished: "..i..
+					" count="..self.count
+				)
 				table.remove(self.active, i)
 				if
 					InstancePolicy.Constant==policy
 					or (InstancePolicy.Reserve==policy
 						and self.count<=self.sound.limit)
 				then
-					Util.debug("  (kept) - count="..self.count)
+					Util.debug("  (kept)")
 					table.insert(self.free, inst)
 				else
-					Util.debug("  (murdered) - count="..self.count)
+					Util.debug("  (murdered)")
 					self.count=self.count-1
 				end
 			end
