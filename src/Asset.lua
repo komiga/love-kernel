@@ -32,10 +32,11 @@ atlas={
 anim={
 	moving_square={
 		"@.png",
-		frame_size={32,32},
+		duration=0.05,
+		size={32,32},
 		set={
-			{8},
-			{8}
+			{8}, -- normal set
+			{8}  -- reverse set
 		}
 	}
 },

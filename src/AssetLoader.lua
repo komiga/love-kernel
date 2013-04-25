@@ -145,17 +145,22 @@ Kind.atlas={
 
 --[[
 
-An automagic atlas of sorts.
+Animation data.
 
 	name={
 		"@.ext",
-		frame_size={32,32},
+		duration=0.2,
+		size={32,32},
 		set={
 			{10},
 			{10},
 			{10}
 		}
 	}
+
+'duration' is the duration of a frame (in seconds).
+
+'size' is the size of each frame.
 
 'set' defines sequence sets. Each set contains only a frame count.
 
@@ -166,64 +171,71 @@ If a set is completed and the frame isn't the last frame in the row,
 the next row will be used for the next set. This can be disabled with
 tight_packing=true.
 
-Once loaded, a frame is accessed by index:
+Once loaded, a frame quad is accessed by index:
 
 	anim.set[set][frame]
 
-Each frame is a Quad. The output animation will also have
-frame_size=size and __texture.
+Each frame is a Quad.
+
+See Animator/AnimInstance.
 
 ]]
 Kind.anim={
 	slug="anim/",
 	loader=function(root_path, name, desc)
 		local path=desc[1]
-		local frame_size=desc.frame_size
+		local duration=desc.duration
+		local size=desc.size
 		local set=desc.set
 		local tight_packing=desc.tight_packing
 		Util.tcheck(path, "string")
-		Util.tcheck(frame_size, "table")
+		Util.tcheck(duration, "number")
+		Util.tcheck(size, "table")
 		Util.tcheck(set, "table")
 		Util.tcheck(tight_packing, "boolean", true)
 
 		local anim={
-			__texture=Gfx.newImage(root_path..fix_path(path, name)),
-			frame_size=frame_size,
-			set={}
+			duration=duration,
+			frame_width=size[1],
+			frame_height=size[2],
+			set={},
+			tex=Gfx.newImage(root_path..fix_path(path, name))
 		}
+		anim.tex_width=anim.tex:getWidth()
+		anim.tex_height=anim.tex:getHeight()
 
-		local check_y0=function(y0, th, sidx)
-			if th<y0 then
-				error("anim set "..sidx.." overflows image")
-			end
+		local dw=anim.frame_width
+		local dh=anim.frame_height
+		local x0, y0=0, 0
+
+		assert(dw<=anim.tex_width)
+		assert(dh<=anim.tex_height)
+
+		local y0_overflow=function(sidx)
+			error("anim set "..sidx.." overflows image")
 		end
 
-		local tw=anim.__texture:getWidth()
-		local th=anim.__texture:getHeight()
-		local fw=frame_size[1]
-		local fh=frame_size[2]
-		local x0, y0=0, 0
-		local sidx, s, count, frame
-
-		assert(fw<=tw)
-		assert(fh<=th)
-
 		for sidx, s in pairs(set) do
-			count=s[1]
 			anim.set[sidx]={}
 			x0=0
-			for frame=1, count do
-				if tw<x0+fw then
+			for frame=1, s[1] do
+				if anim.tex_width<x0+dw then
 					x0=0
-					y0=y0+fh
-					check_y0(y0, th, sidx)
+					y0=y0+dh
+					if anim.tex_height<y0 then
+						y0_overflow(sidx)
+					end
 				end
-				anim.set[sidx][frame]=Gfx.newQuad(x0,y0, fw,fh, tw,th)
-				x0=x0+fw
+				anim.set[sidx][frame]=Gfx.newQuad(
+					x0,y0, dw,dh, anim.tex_width,anim.tex_height
+				)
+				x0=x0+dw
 			end
 			if not tight_packing then
-				y0=y0+fh
-				check_y0(y0, th, sidx)
+				y0=y0+dh
+				if anim.tex_height<y0 then
+					y0_overflow(sidx)
+				end
 			end
 		end
 		return anim
@@ -244,6 +256,8 @@ With path, instance policy, and instance limit:
 
 The second parameter is the instance policy. This is defaulted to
 Constant if limit>0, or Immediate if limit<=0.
+
+See AudioManager/SoundInstance.
 
 --]]
 Kind.sound={

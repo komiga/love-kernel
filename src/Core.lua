@@ -7,6 +7,7 @@ require("src/Bind")
 require("src/AudioManager")
 require("src/FieldAnimator")
 require("src/Hooker")
+require("src/Animator")
 require("src/AssetLoader")
 require("src/Asset")
 
@@ -41,7 +42,7 @@ binds={
 			end
 		end
 	},
-	[{" ", "mouse1"}]={
+	[{" ", "mouse2"}]={
 		kind=Bind.Kind.RELEASE,
 		handler=function(_, _)
 			AudioManager.spawn(Asset.sound.waaauu)
@@ -80,25 +81,11 @@ function init(_)
 	Gfx.setColor(255,255,255, 255)
 	Gfx.setBackgroundColor(0,0,0, 255)
 
-	Core.moving_square=FieldAnimator.new(
-		8*0.05, -- 50ms/frame
-		{
-			s1=1, s2=2, frame=1,
-			update=function(value, fanim)
-				fanim.fields.frame=math.floor(value)
-			end
-		},
-		{
-			["update"]={
-				{1, 8}
-			}
-		},
-		FieldAnimator.Mode.Wrap,
-		function(fanim)
-			fanim.fields.s1, fanim.fields.s2=
-			fanim.fields.s2, fanim.fields.s1
-		end
-	)
+	Core.moving_square={
+		Animator.instance(Asset.anim.moving_square, 1, Animator.Mode.Loop),
+		Animator.instance(Asset.anim.moving_square, 2, Animator.Mode.Loop),
+		i1=1, i2=2
+	}
 end
 
 function exit()
@@ -121,40 +108,32 @@ function update(dt)
 		Hooker.update(dt)
 		AudioManager:update(dt)
 
-		Core.moving_square:update(dt)
+		Core.moving_square[1]:update(dt)
+		if not Core.moving_square[2]:update(dt) then
+			Core.moving_square.i1,
+			Core.moving_square.i2=
+			Core.moving_square.i2,
+			Core.moving_square.i1
+		end
 	end
 end
 
 function render()
-	Hooker.render()
-
 	Gfx.reset()
 
-	local f,a,t
+	local a, t
 
 	a=Asset.atlas.sprites
 	t=a.__texture
-	Gfx.draw(t, 128, 128)
-	Gfx.drawq(t, a.a, 160, 192)
-	Gfx.drawq(t, a.b, 128, 160)
+	Gfx.draw(t, 128,128)
+	Gfx.drawq(t, a.a, 160,192)
+	Gfx.drawq(t, a.b, 128,160)
 
-	f=Core.moving_square
-	a=Asset.anim.moving_square
-	t=a.__texture
-	Gfx.drawq(
-		t, a.set[f.fields.s1][f.fields.frame],
-		32,32
-	)
-	Gfx.drawq(
-		t, a.set[f.fields.s2][f.fields.frame],
-		32,64
-	)
-	Gfx.drawq(
-		t, a.set[f.fields.s1][f.fields.frame],
-		64,64
-	)
-	Gfx.drawq(
-		t, a.set[f.fields.s2][f.fields.frame],
-		64,32
-	)
+	a=Core.moving_square
+	a[a.i1]:render(32, 32)
+	a[a.i2]:render(32, 64)
+	a[a.i1]:render(64, 64)
+	a[a.i2]:render(64, 32)
+
+	Hooker.render()
 end
