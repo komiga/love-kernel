@@ -24,23 +24,26 @@ end
 
 function tcheck(x, tc, opt)
 	opt=Util.optional(opt, false)
-	if "table"==type(tc) then
-		for _, t in pairs(tc) do
-			if not
-				(t==type(x)
-				or (opt and "nil"==type(x)))
-			then
-				assert(false)
-			end
-		end
-		return true
+	assert(
+		tc==type(x)
+		or (opt and nil==x)
+	)
+end
+
+function tcheck_obj(x, tc, opt)
+	opt=Util.optional(opt, false)
+	if nil==x then
+		assert(opt)
 	else
-		assert(
-			tc==type(x)
-			or (opt and "nil"==type(x))
-		)
-		return true
+		if not x:typeOf(tc) then
+			assert(false)
+		end
 	end
+end
+
+function last(table)
+	assert(0<#table)
+	return table[#table]
 end
 
 function random(x, y)
