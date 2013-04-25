@@ -1,6 +1,8 @@
 
 module("AssetLoader", package.seeall)
 
+require("Util")
+
 local function fix_path(path, name)
 	return string.gsub(path, "@", name)
 end
@@ -32,9 +34,8 @@ Kind.font={
 	loader=function(root_path, name, desc)
 		local path=desc[1]
 		local size=desc[2]
-		assert("string"==type(path)
-			or "nil"   ==type(path))
-		assert("number"==type(size))
+		Util.tcheck(path, "string", true)
+		Util.tcheck(size, "number")
 
 		if nil==path then
 			return Gfx.newFont(size)
@@ -95,12 +96,10 @@ Kind.atlas={
 		local indexed=desc.indexed
 		local size=desc.size
 		local tex=desc.tex
-		assert("string" ==type(path))
-		assert("boolean"==type(indexed)
-			or "nil"    ==type(indexed))
-		assert("table"  ==type(size)
-			or "nil"    ==type(size))
-		assert("table"  ==type(tex))
+		Util.tcheck(path, "string")
+		Util.tcheck(indexed, "boolean", true)
+		Util.tcheck(size, "table", true)
+		Util.tcheck(tex, "table")
 
 		local atlas={
 			__texture=Gfx.newImage(root_path..fix_path(path, name))
@@ -181,11 +180,10 @@ Kind.anim={
 		local frame_size=desc.frame_size
 		local set=desc.set
 		local tight_packing=desc.tight_packing
-		assert("string"==type(path))
-		assert("table" ==type(frame_size))
-		assert("table" ==type(set))
-		assert("boolean"==type(tight_packing)
-			or "nil"==type(tight_packing))
+		Util.tcheck(path, "string")
+		Util.tcheck(frame_size, "table")
+		Util.tcheck(set, "table")
+		Util.tcheck(tight_packing, "boolean", true)
 
 		local anim={
 			__texture=Gfx.newImage(root_path..fix_path(path, name)),
@@ -246,9 +244,9 @@ local function load_kind(root_path, kind_name, desc_table, asset_table)
 end
 
 function load(root_path, desc_root, asset_table)
-	assert("string"==type(root_path))
-	assert("table" ==type(desc_root))
-	assert("table" ==type(asset_table))
+	Util.tcheck(root_path, "string")
+	Util.tcheck(desc_root, "table")
+	Util.tcheck(asset_table, "table")
 
 	for _, kind_name in pairs(LoadOrder) do
 		local desc_table=desc_root[kind_name]

@@ -13,9 +13,9 @@ local Hooklet={}
 Hooklet.__index=Hooklet
 
 function Hooklet:__init(props, x, y)
-	assert("table"==type(props))
-	assert("number"==type(x))
-	assert("number"==type(y))
+	Util.tcheck(props, "table")
+	Util.tcheck(x, "number")
+	Util.tcheck(y, "number")
 
 	self.props=props
 	self.x=x
@@ -40,10 +40,11 @@ end
 
 function Hooklet:render()
 	Util.set_color_table(self.props.color, self.fields.alpha)
+	Gfx.setFont(self.props.font)
+
 	Gfx.translate(self.x+self.fields.tx, self.y+self.fields.ty)
 	Gfx.rotate(self.fields.angle)
 	Gfx.scale(self.fields.sx, self.fields.sy)
-	Gfx.setFont(self.props.font)
 	Gfx.print(
 		self.props.text,
 		-self.props.half_width,
@@ -52,6 +53,8 @@ function Hooklet:render()
 end
 
 function init(hooklet_props, default_font)
+	Util.tcheck(hooklet_props, "table")
+	Util.tcheck(default_font, "userdata", true)
 	assert(not data.__initialized)
 
 	if nil==default_font then

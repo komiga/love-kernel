@@ -1,6 +1,8 @@
 
 module("Bind", package.seeall)
 
+require("src/Util")
+
 Kind={
 	PRESS=1,
 	WHILE=2,
@@ -70,7 +72,8 @@ local function bind_release(ident)
 end
 
 function init(bind_table, gate_fn)
-	assert("table"==type(bind_table))
+	Util.tcheck(bind_table, "table")
+	Util.tcheck(gate_fn, "function")
 
 	data.binds=bind_table
 	data.gate_fn=gate_fn
@@ -79,7 +82,7 @@ function init(bind_table, gate_fn)
 	local check={}
 	local expanded={}
 	for ident, bind in pairs(data.binds) do
-		assert("table"==type(bind))
+		Util.tcheck(bind, "table")
 		bind.ident=ident
 		if "table"==type(ident) then
 			for _, sub_ident in pairs(ident) do
