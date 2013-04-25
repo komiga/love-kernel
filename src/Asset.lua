@@ -44,7 +44,7 @@ sound={
 	waaauu={
 		"@.ogg",
 		InstancePolicy.Reserve,
-		limit=2
+		limit=10
 	}
 }
 
