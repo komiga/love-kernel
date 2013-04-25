@@ -4,10 +4,7 @@ module("Hooker", package.seeall)
 require("src/Util")
 require("src/FieldAnimator")
 
-local data={
-	__initialized=false,
-	active=nil
-}
+-- class Hooklet
 
 local Hooklet={}
 Hooklet.__index=Hooklet
@@ -52,9 +49,16 @@ function Hooklet:render()
 	)
 end
 
+-- Hooker interface
+
+local data={
+	__initialized=false,
+	active=nil
+}
+
 function init(hooklet_props, default_font)
 	Util.tcheck(hooklet_props, "table")
-	Util.tcheck(default_font, "userdata", true)
+	Util.tcheck_obj(default_font, "Font", true)
 	assert(not data.__initialized)
 
 	if nil==default_font then
