@@ -9,6 +9,8 @@ Mode={
 	Continue=3
 }
 
+-- class FieldAnimator
+
 local Unit={}
 Unit.__index=Unit
 
