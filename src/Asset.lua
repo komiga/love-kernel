@@ -12,12 +12,11 @@ InstancePolicy=AudioManager.InstancePolicy
 desc_root={
 
 font={
-	main={nil, 18}
+	main={18, default=true}
 },
 
 atlas={
 	sprites={
-		"@.png",
 		indexed=true,
 		size={32,32},
 		tex={
@@ -31,7 +30,6 @@ atlas={
 
 anim={
 	moving_square={
-		"@.png",
 		duration=0.05,
 		size={32,32},
 		set={
@@ -43,7 +41,6 @@ anim={
 
 sound={
 	waaauu={
-		"@.ogg",
 		InstancePolicy.Reserve,
 		limit=10
 	}

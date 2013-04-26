@@ -5,15 +5,24 @@ require("src/Util")
 require("src/AudioManager")
 require("src/Animator")
 
-local function fix_path(path, name)
-	return string.gsub(path, "@", name)
-end
-
 local Kind={}
+
+local function get_asset_path(root_path, path, name, ext)
+	Util.tcheck(path, "string", true)
+	if nil==path then
+		return root_path..name..'.'..ext
+	else
+		return root_path..string.gsub(path, '@', name)
+	end
+end
 
 --[[
 
 NOTE: '@' in descriptor paths will be replaced with the name of the asset.
+
+All descriptors can take a 'path' value, but default to 'name.ext'
+where 'ext' is the default extension for the asset kind. 'ext' can be
+used to override the default extension.
 
 All assets except for fonts (that is, all tables) will have a unique
 integer value '__id'.
@@ -22,30 +31,35 @@ integer value '__id'.
 
 --[[
 
-With path:
+With path (using name and .ttf):
 
 	name={
-		"@.ext",
 		18
 	}
 
 Or default font with size:
 
-	name={18}
+	name={
+		18,
+		default=true
+	}
 
 ]]
 Kind.font={
 	slug="font/",
 	loader=function(root_path, name, desc)
-		local path=desc[1]
-		local size=desc[2]
-		Util.tcheck(path, "string", true)
+		local size=desc[1]
+		local default=desc.default
 		Util.tcheck(size, "number")
+		Util.tcheck(default, "boolean", true)
 
-		if nil==path then
+		if default then
 			return Gfx.newFont(size)
 		else
-			return Gfx.newFont(root_path..fix_path(path, name), size)
+			return Gfx.newFont(
+				get_asset_path(root_path, desc.path, name, desc.ext or "ttf"),
+				size
+			)
 		end
 	end
 }
@@ -55,7 +69,6 @@ Kind.font={
 With positions and sizes:
 
 	name={
-		"@.ext",
 		tex={
 			{"t0",  0,0, 32,32},
 			{"t1", 32,0, 32,32},
@@ -66,7 +79,6 @@ With positions and sizes:
 With constant size:
 
 	name={
-		"@.ext",
 		size={32,32},
 		tex={
 			{"t0",  0,0},
@@ -78,7 +90,6 @@ With constant size:
 With constant size and indexed positions:
 
 	name={
-		"@.ext",
 		indexed=true,
 		size={32,32},
 		tex={
@@ -97,17 +108,17 @@ In the last two forms, full quads are still permitted
 Kind.atlas={
 	slug="atlas/",
 	loader=function(root_path, name, desc)
-		local path=desc[1]
 		local indexed=desc.indexed
 		local size=desc.size
 		local tex=desc.tex
-		Util.tcheck(path, "string")
 		Util.tcheck(indexed, "boolean", true)
 		Util.tcheck(size, "table", true)
 		Util.tcheck(tex, "table")
 
 		local atlas={
-			__tex=Gfx.newImage(root_path..fix_path(path, name))
+			__tex=Gfx.newImage(
+				get_asset_path(root_path, desc.path, name, desc.ext or "png")
+			)
 		}
 
 		local aw=atlas.__tex:getWidth()
@@ -152,7 +163,6 @@ Kind.atlas={
 Animation data.
 
 	name={
-		"@.ext",
 		duration=0.2,
 		size={32,32},
 		set={
@@ -187,12 +197,10 @@ See Animator/AnimInstance.
 Kind.anim={
 	slug="anim/",
 	loader=function(root_path, name, desc)
-		local path=desc[1]
 		local duration=desc.duration
 		local size=desc.size
 		local set=desc.set
 		local tight_packing=desc.tight_packing
-		Util.tcheck(path, "string")
 		Util.tcheck(duration, "number")
 		Util.tcheck(size, "table")
 		Util.tcheck(set, "table")
@@ -203,7 +211,9 @@ Kind.anim={
 			frame_width=size[1],
 			frame_height=size[2],
 			set={},
-			tex=Gfx.newImage(root_path..fix_path(path, name))
+			tex=Gfx.newImage(
+				get_asset_path(root_path, desc.path, name, desc.ext or "png")
+			)
 		}
 		ad.tex_width=ad.tex:getWidth()
 		ad.tex_height=ad.tex:getHeight()
@@ -251,7 +261,6 @@ Kind.anim={
 With path, instance policy, and instance limit:
 
 	name={
-		"@.ext",
 		InstancePolicy.Constant,
 		limit=10
 	}
@@ -267,10 +276,8 @@ See AudioManager/SoundInstance.
 Kind.sound={
 	slug="sound/",
 	loader=function(root_path, name, desc)
-		local path=desc[1]
-		local policy=desc[2]
+		local policy=desc[1]
 		local limit=desc.limit
-		Util.tcheck(path, "string")
 		Util.tcheck(policy, "number", true)
 		Util.tcheck(limit, "number", true)
 
@@ -289,7 +296,7 @@ Kind.sound={
 
 		local sd={
 			data=love.sound.newSoundData(
-				root_path..fix_path(path, name)
+				get_asset_path(root_path, desc.path, name, desc.ext or "ogg")
 			),
 			policy=policy,
 			limit=limit
