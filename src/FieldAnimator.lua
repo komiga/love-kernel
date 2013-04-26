@@ -15,11 +15,10 @@ local Unit={}
 Unit.__index=Unit
 
 function new(duration, fields, trans, mode, serial_reset_callback)
-	local fa={}
-	setmetatable(fa, Unit)
-
-	fa:__init(duration, fields, trans, mode, serial_reset_callback)
-	return fa
+	return Util.new_object(
+		Unit,
+		duration, fields, trans, mode, serial_reset_callback
+	)
 end
 
 function Unit:__init(duration, fields, trans, mode, serial_reset_callback)

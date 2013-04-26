@@ -89,12 +89,9 @@ function clear()
 	data.active={}
 end
 
-function spawn(prop_table, x, y)
-	local h={}
-	setmetatable(h, Hooklet)
-
-	h:__init(prop_table, x, y)
-	table.insert(data.active, h)
+function spawn(props, x, y)
+	local hkl=Util.new_object(Hooklet, props, x, y)
+	table.insert(data.active, hkl)
 end
 
 function update(dt)

@@ -74,6 +74,7 @@ function init(_)
 	AssetLoader.load("asset/", Asset.desc_root, Asset)
 	Hooker.init(Asset.hooklets, Asset.font.main)
 
+	Animator.init(Asset.anim)
 	AudioManager.init(Asset.sound)
 
 	-- default rendering state
@@ -81,16 +82,33 @@ function init(_)
 	Gfx.setColor(255,255,255, 255)
 	Gfx.setBackgroundColor(0,0,0, 255)
 
+	local anim_data=Asset.anim.moving_square
+	Core.batcher=Animator.batcher(
+		anim_data, 4, Animator.BatchMode.Dynamic
+	)
 	Core.moving_square={
-		Animator.instance(Asset.anim.moving_square, 1, Animator.Mode.Loop),
-		Animator.instance(Asset.anim.moving_square, 2, Animator.Mode.Loop),
-		i1=1, i2=2
+		Animator.instance(anim_data, 1, Animator.Mode.Loop),
+		Animator.instance(anim_data, 2, Animator.Mode.Loop),
+		Animator.instance(anim_data, 1, Animator.Mode.Loop),
+		Animator.instance(anim_data, 2, Animator.Mode.Loop),
+		data=anim_data,
+		i1=1, i2=2,
+		i3=3, i4=4
 	}
+
+	-- Ensure debug_mode is disabled after init
+	State.debug_mode=false
+end
+
+function deinit()
+	Core.moving_square=nil
+	Core.batcher=nil
 end
 
 function exit()
 	-- Yes! I want to terminate!
 	-- ... Wait, what? That's false?
+	Core.deinit()
 	return false
 end
 
@@ -109,11 +127,17 @@ function update(dt)
 		AudioManager:update(dt)
 
 		Core.moving_square[1]:update(dt)
-		if not Core.moving_square[2]:update(dt) then
+		Core.moving_square[2]:update(dt)
+		Core.moving_square[3]:update(dt)
+		if not Core.moving_square[4]:update(dt) then
 			Core.moving_square.i1,
 			Core.moving_square.i2=
 			Core.moving_square.i2,
 			Core.moving_square.i1
+			Core.moving_square.i3,
+			Core.moving_square.i4=
+			Core.moving_square.i4,
+			Core.moving_square.i3
 		end
 	end
 end
@@ -121,19 +145,24 @@ end
 function render()
 	Gfx.reset()
 
-	local a, t
+	local b, a, t
 
 	a=Asset.atlas.sprites
-	t=a.__texture
+	t=a.__tex
 	Gfx.draw(t, 128,128)
 	Gfx.drawq(t, a.a, 160,192)
 	Gfx.drawq(t, a.b, 128,160)
 
 	a=Core.moving_square
-	a[a.i1]:render(32, 32)
-	a[a.i2]:render(32, 64)
-	a[a.i1]:render(64, 64)
-	a[a.i2]:render(64, 32)
+	b=Core.batcher
+
+	b:batch_begin()
+		b:add(a[a.i1], 32, 32)
+		b:add(a[a.i2], 32, 64)
+		b:add(a[a.i3], 64, 64)
+		b:add(a[a.i4], 64, 32)
+	b:batch_end()
+	b:render()
 
 	Hooker.render()
 end

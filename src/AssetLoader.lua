@@ -3,6 +3,7 @@ module("AssetLoader", package.seeall)
 
 require("src/Util")
 require("src/AudioManager")
+require("src/Animator")
 
 local function fix_path(path, name)
 	return string.gsub(path, "@", name)
@@ -13,6 +14,9 @@ local Kind={}
 --[[
 
 NOTE: '@' in descriptor paths will be replaced with the name of the asset.
+
+All assets except for fonts (that is, all tables) will have a unique
+integer value '__id'.
 
 ]]
 
@@ -103,11 +107,11 @@ Kind.atlas={
 		Util.tcheck(tex, "table")
 
 		local atlas={
-			__texture=Gfx.newImage(root_path..fix_path(path, name))
+			__tex=Gfx.newImage(root_path..fix_path(path, name))
 		}
 
-		local aw=atlas.__texture:getWidth()
-		local ah=atlas.__texture:getHeight()
+		local aw=atlas.__tex:getWidth()
+		local ah=atlas.__tex:getHeight()
 		local x0,y0, sw,sh
 		local idx, t
 
@@ -173,7 +177,7 @@ tight_packing=true.
 
 Once loaded, a frame quad is accessed by index:
 
-	anim.set[set][frame]
+	anim_data.set[set][frame]
 
 Each frame is a Quad.
 
@@ -194,51 +198,51 @@ Kind.anim={
 		Util.tcheck(set, "table")
 		Util.tcheck(tight_packing, "boolean", true)
 
-		local anim={
+		local ad={
 			duration=duration,
 			frame_width=size[1],
 			frame_height=size[2],
 			set={},
 			tex=Gfx.newImage(root_path..fix_path(path, name))
 		}
-		anim.tex_width=anim.tex:getWidth()
-		anim.tex_height=anim.tex:getHeight()
+		ad.tex_width=ad.tex:getWidth()
+		ad.tex_height=ad.tex:getHeight()
 
-		local dw=anim.frame_width
-		local dh=anim.frame_height
+		local dw=ad.frame_width
+		local dh=ad.frame_height
 		local x0, y0=0, 0
 
-		assert(dw<=anim.tex_width)
-		assert(dh<=anim.tex_height)
+		assert(dw<=ad.tex_width)
+		assert(dh<=ad.tex_height)
 
 		local y0_overflow=function(sidx)
-			error("anim set "..sidx.." overflows image")
+			error("animation set "..sidx.." overflows texture")
 		end
 
 		for sidx, s in pairs(set) do
-			anim.set[sidx]={}
+			ad.set[sidx]={}
 			x0=0
 			for frame=1, s[1] do
-				if anim.tex_width<x0+dw then
+				if ad.tex_width<x0+dw then
 					x0=0
 					y0=y0+dh
-					if anim.tex_height<y0 then
+					if ad.tex_height<y0 then
 						y0_overflow(sidx)
 					end
 				end
-				anim.set[sidx][frame]=Gfx.newQuad(
-					x0,y0, dw,dh, anim.tex_width,anim.tex_height
+				ad.set[sidx][frame]=Gfx.newQuad(
+					x0,y0, dw,dh, ad.tex_width,ad.tex_height
 				)
 				x0=x0+dw
 			end
 			if not tight_packing then
 				y0=y0+dh
-				if anim.tex_height<y0 then
+				if ad.tex_height<y0 then
 					y0_overflow(sidx)
 				end
 			end
 		end
-		return anim
+		return ad
 	end
 }
 
@@ -283,15 +287,14 @@ Kind.sound={
 			error("policy cannot be Constant when limit=0")
 		end
 
-		local sound={
+		local sd={
 			data=love.sound.newSoundData(
 				root_path..fix_path(path, name)
 			),
 			policy=policy,
 			limit=limit
 		}
-
-		return sound
+		return sd
 	end
 }
 
@@ -302,12 +305,18 @@ local LoadOrder={
 	"sound"
 }
 
-local function load_kind(root_path, kind_name, desc_table, asset_table)
+local function load_kind(id, root_path, kind_name, desc_table, asset_table)
 	local kind=Kind[kind_name]
 	root_path=root_path..kind.slug
 	for name, desc in pairs(desc_table) do
-		asset_table[kind_name][name]=kind.loader(root_path, name, desc)
+		local asset=kind.loader(root_path, name, desc)
+		if "table"==type(asset) then
+			asset.__id=id
+			id=id+1
+		end
+		asset_table[kind_name][name]=asset
 	end
+	return id
 end
 
 function load(root_path, desc_root, asset_table)
@@ -315,13 +324,14 @@ function load(root_path, desc_root, asset_table)
 	Util.tcheck(desc_root, "table")
 	Util.tcheck(asset_table, "table")
 
+	local id=1
 	for _, kind_name in pairs(LoadOrder) do
 		local desc_table=desc_root[kind_name]
 		if nil~=desc_table then
 			if nil==asset_table[kind_name] then
 				asset_table[kind_name]={}
 			end
-			load_kind(root_path, kind_name, desc_table, asset_table)
+			id=load_kind(id, root_path, kind_name, desc_table, asset_table)
 		end
 	end
 end

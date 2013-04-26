@@ -15,16 +15,12 @@ InstancePolicy={
 local SoundInstance={}
 SoundInstance.__index=SoundInstance
 
-function SoundInstance.new(sound, x, y, z)
-	local inst={}
-	setmetatable(inst, SoundInstance)
-
-	inst:__init(sound, x, y, z)
-	return inst
+function SoundInstance.new(sound_data, x, y, z)
+	return Util.new_object(SoundInstance, sound_data, x, y, z)
 end
 
-function SoundInstance:__init(sound, x, y, z)
-	self.source=Sfx.newSource(sound.data, "static")
+function SoundInstance:__init(sound_data, x, y, z)
+	self.source=Sfx.newSource(sound_data.data, "static")
 	self:set_position(x, y, z)
 end
 
@@ -49,27 +45,26 @@ end
 local Bucket={}
 Bucket.__index=Bucket
 
-function Bucket.new(sound)
-	local bkt={}
-	setmetatable(bkt, Bucket)
-
-	bkt:__init(sound)
-	return bkt
+function Bucket.new(sound_data)
+	return Util.new_object(Bucket, sound_data)
 end
 
-function Bucket:__init(sound)
-	Util.tcheck(sound, "table")
-	Util.tcheck_obj(sound.data, "SoundData")
+function Bucket:__init(sound_data)
+	Util.tcheck(sound_data, "table")
+	Util.tcheck_obj(sound_data.data, "SoundData")
 
-	self.sound=sound
+	self.data=sound_data
 	self.active={}
 	self.free={}
 
-	if InstancePolicy.Immediate~=self.sound.policy then
-		for i=1, self.sound.limit do
-			table.insert(self.free, SoundInstance.new(sound, 0.0, 0.0, 0.0))
+	if InstancePolicy.Immediate~=self.data.policy then
+		for i=1, self.data.limit do
+			table.insert(
+				self.free,
+				SoundInstance.new(sound_data, 0.0, 0.0, 0.0)
+			)
 		end
-		self.count=self.sound.limit
+		self.count=self.data.limit
 	end
 end
 
@@ -79,8 +74,8 @@ function Bucket:spawn(x, y, z)
 		inst=Util.last(self.free)
 		table.remove(self.free)
 	else
-		if InstancePolicy.Constant~=self.sound.policy then
-			inst=SoundInstance.new(self.sound, x, y, z)
+		if InstancePolicy.Constant~=self.data.policy then
+			inst=SoundInstance.new(self.data, x, y, z)
 			self.count=self.count+1
 		end
 	end
@@ -92,7 +87,7 @@ function Bucket:spawn(x, y, z)
 end
 
 function Bucket:update(dt)
-	local policy=self.sound.policy
+	local policy=self.data.policy
 	if 0<#self.active then
 		for i, inst in pairs(self.active) do
 			if not inst:update(dt) then
@@ -104,7 +99,7 @@ function Bucket:update(dt)
 				if
 					InstancePolicy.Constant==policy
 					or (InstancePolicy.Reserve==policy
-						and self.count<=self.sound.limit)
+						and self.count<=self.data.limit)
 				then
 					Util.debug("  (kept)")
 					table.insert(self.free, inst)
@@ -134,7 +129,7 @@ function init(sound_table)
 	data.__initialized=true
 
 	for _, sd in pairs(sound_table) do
-		data.buckets[sd]=Bucket.new(sd)
+		data.buckets[sd.__id]=Bucket.new(sd)
 	end
 end
 
@@ -142,8 +137,8 @@ function set_position(x, y, z)
 	Sfx.setPosition(x, y, Util.optional(z, 0.0))
 end
 
-function spawn(sound, x, y, z)
-	local bkt=data.buckets[sound]
+function spawn(sound_data, x, y, z)
+	local bkt=data.buckets[sound_data.__id]
 	assert(nil~=bkt)
 
 	bkt:spawn(

@@ -8,20 +8,35 @@ Mode={
 	Loop=2
 }
 
+BatchMode={
+	Dynamic=1,
+	Static=2,
+	Stream=3
+}
+
+local BatchModeName={
+	"dynamic",
+	"static",
+	"stream"
+}
+
 -- class AnimInstance
 
 local AnimInstance={}
 AnimInstance.__index=AnimInstance
 
-function AnimInstance:__init(anim_data, sindex, mode)
-	Util.tcheck(anim_data, "table")
+function AnimInstance:__init(ad, sindex, mode)
+	Util.tcheck(ad, "table")
 	Util.tcheck(sindex, "number", true)
 	Util.tcheck(mode, "number", true)
+
+	assert(1<=sindex and #ad.set>=sindex)
 
 	sindex=Util.optional(sindex, 1)
 	mode=Util.optional(mode, Mode.Stop)
 
-	self.data=anim_data
+	self.batch_id=nil
+	self.data=ad
 	self:reset(sindex, mode)
 end
 
@@ -48,8 +63,8 @@ function AnimInstance:is_playing()
 	return self.playing
 end
 
--- Will return false if either the animation is not playing or if
--- the animation has looped
+-- Will return false if either the animation is
+-- not playing or if the animation has looped
 function AnimInstance:update(dt)
 	if self.playing then
 		self.accum=self.accum+dt
@@ -76,11 +91,73 @@ function AnimInstance:update(dt)
 	end
 end
 
-function AnimInstance:render(x, y)
+function AnimInstance:render(x,y, r, sx,sy, ox,oy)
 	Gfx.drawq(
 		self.data.tex, self.set[self.frame],
-		x, y
+		x,y, r, sx,sy, ox,oy
 	)
+end
+
+-- class AnimBatcher
+
+local AnimBatcher={}
+AnimBatcher.__index=AnimBatcher
+
+function AnimBatcher:__init(ad, limit, mode)
+	Util.tcheck(ad, "table")
+	Util.tcheck(limit, "number")
+	Util.tcheck(mode, "number", true)
+
+	mode=Util.optional(mode, BatchMode.Dynamic)
+
+	self.data=ad
+	self.limit=limit
+	self.mode=mode
+	self.batch=Gfx.newSpriteBatch(
+		self.data.tex,
+		self.limit,
+		BatchModeName[self.mode]
+	)
+	self.active={}
+end
+
+function AnimBatcher:clear()
+	self.batch:clear()
+	self.active={}
+end
+
+function AnimBatcher:batch_begin()
+	self.batch:bind()
+end
+
+function AnimBatcher:batch_end()
+	self.batch:unbind()
+end
+
+-- NOTE: add order determines render order
+function AnimBatcher:add(inst, x,y, r, sx,sy, ox,oy)
+	local batch_id=self.active[inst]
+	if nil~=batch_id then
+		self.batch:setq(
+			batch_id,
+			inst.set[inst.frame],
+			x,y, r, sx,sy, ox,oy
+		)
+	else
+		if self.limit<=#self.active then
+			Util.debug("AnimBatcher: batch full")
+		else
+			local batch_id=self.batch:addq(
+				inst.set[inst.frame],
+				x,y, r, sx,sy, ox,oy
+			)
+			self.active[inst]=batch_id
+		end
+	end
+end
+
+function AnimBatcher:render()
+	Gfx.draw(self.batch, 0,0)
 end
 
 -- Animator interface
@@ -96,10 +173,10 @@ function init(anim_table)
 	data.__initialized=true
 end
 
-function instance(anim_data, sindex, mode)
-	local anim={}
-	setmetatable(anim, AnimInstance)
+function batcher(ad, limit, mode)
+	return Util.new_object(AnimBatcher, ad, limit, mode)
+end
 
-	anim:__init(anim_data, sindex, mode)
-	return anim
+function instance(ad, sindex, mode)
+	return Util.new_object(AnimInstance, ad, sindex, mode)
 end

@@ -65,6 +65,14 @@ function choose_random(table)
 	return table[Util.random(1, #table)]
 end
 
+function new_object(class, ...)
+	local obj={}
+	setmetatable(obj, class)
+
+	obj:__init(...)
+	return obj
+end
+
 -- takes:
 --	(rgba, alpha_opt),
 --	(rgb, alpha), or
