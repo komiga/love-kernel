@@ -66,7 +66,17 @@ function bind_trigger_gate(_, _)
 end
 
 function init(_)
-	-- initialization
+	-- Ensure debug_mode is enabled for initialization
+	local debug_mode_temp=false
+	if not State.debug_mode then
+		State.debug_mode=true
+		debug_mode_temp=true
+	end
+
+	Core.display_width=Gfx.getWidth()
+	Core.display_height=Gfx.getHeight()
+
+	-- system initialization
 	Util.init()
 	Bind.init(Core.binds, Core.bind_trigger_gate)
 
@@ -96,8 +106,10 @@ function init(_)
 		i3=3, i4=4
 	}
 
-	-- Ensure debug_mode is disabled after init
-	State.debug_mode=false
+	-- Ensure debug_mode is disabled after initialization
+	if debug_mode_temp then
+		State.debug_mode=false
+	end
 end
 
 function deinit()
@@ -143,7 +155,11 @@ function update(dt)
 end
 
 function render()
-	Gfx.reset()
+	Gfx.setColor(255,255,255, 255)
+
+	Gfx.rectangle("line",
+		0.0,0.0, Core.display_width, Core.display_height
+	)
 
 	local b, a, t
 
