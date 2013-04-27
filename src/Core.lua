@@ -4,6 +4,7 @@ module("Core", package.seeall)
 require("src/State")
 require("src/Util")
 require("src/Bind")
+require("src/Camera")
 require("src/AudioManager")
 require("src/FieldAnimator")
 require("src/Hooker")
@@ -31,6 +32,12 @@ binds={
 			end
 		end
 	},
+	["f3"]={
+		kind=Bind.Kind.RELEASE,
+		handler=function(_, _)
+			print(Camera.get_x(), Camera.get_y())
+		end
+	},
 	["f4"]={
 		kind=Bind.Kind.RELEASE,
 		handler=function(_, _)
@@ -42,14 +49,40 @@ binds={
 			end
 		end
 	},
+	["mouse1"]={
+		kind=Bind.Kind.WHILE,
+		handler=function(_, _)
+			Camera.target(
+				HID.Mouse.getX(),
+				HID.Mouse.getY()
+			)
+		end
+	},
+	[{"up", "down", "left", "right"}]={
+		kind=Bind.Kind.WHILE,
+		handler=function(ident, _)
+			local xm, ym=5.0, 5.0
+			if "up"==ident then
+				Camera.move(0.0, -ym)
+			elseif "down"==ident then
+				Camera.move(0.0,  ym)
+			elseif "left"==ident then
+				Camera.move(-xm, 0.0)
+			elseif "right"==ident then
+				Camera.move( xm, 0.0)
+			end
+		end
+	},
 	[{" ", "mouse2"}]={
 		kind=Bind.Kind.RELEASE,
 		handler=function(_, _)
+			local rx=Camera.relative_x(HID.Mouse.getX()-Core.display_width_half)
+			local ry=Camera.relative_y(HID.Mouse.getY()-Core.display_height_half)
+			Util.debug("rx="..rx.."  ry="..ry)
 			AudioManager.spawn(Asset.sound.waaauu)
 			Hooker.spawn(
 				Asset.hooklets.KUMQUAT,
-				HID.Mouse.getX(),
-				HID.Mouse.getY()
+				rx,ry
 			)
 		end
 	},
@@ -74,7 +107,9 @@ function init(_)
 	end
 
 	Core.display_width=Gfx.getWidth()
+	Core.display_width_half=0.5*Core.display_width
 	Core.display_height=Gfx.getHeight()
+	Core.display_height_half=0.5*Core.display_height
 
 	-- system initialization
 	Util.init()
@@ -91,6 +126,12 @@ function init(_)
 	Gfx.setFont(Asset.font.main)
 	Gfx.setColor(255,255,255, 255)
 	Gfx.setBackgroundColor(0,0,0, 255)
+
+	Camera.init(
+		Core.display_width_half, Core.display_height_half,
+		Core.display_width_half, Core.display_height_half,
+		60.0, 60.0
+	)
 
 	local anim_data=Asset.anim.moving_square
 	Core.batcher=Animator.batcher(
@@ -134,6 +175,7 @@ function update(dt)
 	if true==State.paused then
 		Bind.update(0.0)
 	else
+		Camera.update(dt)
 		Bind.update(dt)
 		Hooker.update(dt)
 		AudioManager:update(dt)
@@ -161,7 +203,13 @@ function render()
 		0.0,0.0, Core.display_width, Core.display_height
 	)
 
+	Camera.lock()
 	local b, a, t
+
+	Gfx.point(
+		Camera.relative_x(0),
+		Camera.relative_y(0)
+	)
 
 	a=Asset.atlas.sprites
 	t=a.__tex
@@ -172,6 +220,8 @@ function render()
 	a=Core.moving_square
 	b=Core.batcher
 
+	Gfx.push()
+	--Gfx.translate(-32.0, 0.0)
 	b:batch_begin()
 		b:add(a[a.i1], 32, 32)
 		b:add(a[a.i2], 32, 64)
@@ -179,6 +229,8 @@ function render()
 		b:add(a[a.i4], 64, 32)
 	b:batch_end()
 	b:render()
+	Gfx.pop()
 
 	Hooker.render()
+	Camera.unlock()
 end
