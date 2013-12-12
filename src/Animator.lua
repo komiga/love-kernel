@@ -3,18 +3,18 @@ module("Animator", package.seeall)
 
 require("src/Util")
 
-Mode={
-	Stop=1,
-	Loop=2
+Mode = {
+	Stop = 1,
+	Loop = 2
 }
 
-BatchMode={
-	Dynamic=1,
-	Static=2,
-	Stream=3
+BatchMode = {
+	Dynamic = 1,
+	Static = 2,
+	Stream = 3
 }
 
-local BatchModeName={
+local BatchModeName = {
 	"dynamic",
 	"static",
 	"stream"
@@ -22,41 +22,41 @@ local BatchModeName={
 
 -- class AnimInstance
 
-local AnimInstance={}
-AnimInstance.__index=AnimInstance
+local AnimInstance = {}
+AnimInstance.__index = AnimInstance
 
 function AnimInstance:__init(ad, sindex, mode)
 	Util.tcheck(ad, "table")
 	Util.tcheck(sindex, "number", true)
 	Util.tcheck(mode, "number", true)
 
-	assert(1<=sindex and #ad.set>=sindex)
+	assert(1 <= sindex and #ad.set >= sindex)
 
-	sindex=Util.optional(sindex, 1)
-	mode=Util.optional(mode, Mode.Stop)
+	sindex = Util.optional(sindex, 1)
+	mode = Util.optional(mode, Mode.Stop)
 
-	self.batch_id=nil
-	self.data=ad
+	self.batch_id = nil
+	self.data = ad
 	self:reset(sindex, mode)
 end
 
 function AnimInstance:reset(sindex, mode)
-	self.mode=mode
-	self.playing=true
-	self.set=self.data.set[sindex]
-	self.accum=0.0
-	self.frame=1
+	self.mode = mode
+	self.playing = true
+	self.set = self.data.set[sindex]
+	self.accum = 0.0
+	self.frame = 1
 end
 
 function rewind(frame)
-	if nil~=frame then
-		self.accum=frame*self.data.duration
-		self.frame=frame
+	if nil ~= frame then
+		self.accum = frame * self.data.duration
+		self.frame = frame
 	else
-		self.accum=0.0
-		self.frame=1
+		self.accum = 0.0
+		self.frame = 1
 	end
-	self.playing=true
+	self.playing = true
 end
 
 function AnimInstance:is_playing()
@@ -67,22 +67,22 @@ end
 -- not playing or if the animation has looped
 function AnimInstance:update(dt)
 	if self.playing then
-		self.accum=self.accum+dt
-		if self.data.duration<=self.accum then
-			local amt=math.floor(self.accum/self.data.duration)
-			local new_frame=self.frame+amt
-			if new_frame>#self.set then
-				if Mode.Loop==self.mode then
-					self.accum=0.0
-					self.frame=1
+		self.accum = self.accum + dt
+		if self.data.duration <= self.accum then
+			local amt = math.floor(self.accum/self.data.duration)
+			local new_frame = self.frame + amt
+			if new_frame > #self.set then
+				if Mode.Loop == self.mode then
+					self.accum = 0.0
+					self.frame = 1
 					return false
 				else
-					self.frame=#self.set
-					self.playing=false
+					self.frame = #self.set
+					self.playing = false
 				end
 			else
-				self.accum=self.accum-(amt*self.data.duration)
-				self.frame=new_frame
+				self.accum = self.accum - (amt * self.data.duration)
+				self.frame = new_frame
 			end
 		end
 		return self.playing
@@ -100,30 +100,30 @@ end
 
 -- class AnimBatcher
 
-local AnimBatcher={}
-AnimBatcher.__index=AnimBatcher
+local AnimBatcher = {}
+AnimBatcher.__index = AnimBatcher
 
 function AnimBatcher:__init(ad, limit, mode)
 	Util.tcheck(ad, "table")
 	Util.tcheck(limit, "number")
 	Util.tcheck(mode, "number", true)
 
-	mode=Util.optional(mode, BatchMode.Dynamic)
+	mode = Util.optional(mode, BatchMode.Dynamic)
 
-	self.data=ad
-	self.limit=limit
-	self.mode=mode
-	self.batch=Gfx.newSpriteBatch(
+	self.data = ad
+	self.limit = limit
+	self.mode = mode
+	self.batch = Gfx.newSpriteBatch(
 		self.data.tex,
 		self.limit,
 		BatchModeName[self.mode]
 	)
-	self.active={}
+	self.active = {}
 end
 
 function AnimBatcher:clear()
 	self.batch:clear()
-	self.active={}
+	self.active = {}
 end
 
 function AnimBatcher:batch_begin()
@@ -136,22 +136,22 @@ end
 
 -- NOTE: add order determines render order
 function AnimBatcher:add(inst, x,y, r, sx,sy, ox,oy)
-	local batch_id=self.active[inst]
-	if nil~=batch_id then
+	local batch_id = self.active[inst]
+	if nil ~= batch_id then
 		self.batch:setq(
 			batch_id,
 			inst.set[inst.frame],
 			x,y, r, sx,sy, ox,oy
 		)
 	else
-		if self.limit<=#self.active then
+		if self.limit <= #self.active then
 			Util.debug("AnimBatcher: batch full")
 		else
-			local batch_id=self.batch:addq(
+			local batch_id = self.batch:addq(
 				inst.set[inst.frame],
 				x,y, r, sx,sy, ox,oy
 			)
-			self.active[inst]=batch_id
+			self.active[inst] = batch_id
 		end
 	end
 end
@@ -162,15 +162,15 @@ end
 
 -- Animator interface
 
-local data={
-	__initialized=false
+local data = {
+	__initialized = false
 }
 
 function init(anim_table)
 	Util.tcheck(anim_table, "table")
 	assert(not data.__initialized)
 
-	data.__initialized=true
+	data.__initialized = true
 end
 
 function batcher(ad, limit, mode)

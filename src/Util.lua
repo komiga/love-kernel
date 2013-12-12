@@ -3,14 +3,14 @@ module("Util", package.seeall)
 
 require("src/State")
 
---local M_lrandom=require("random")
+--local M_lrandom = require("random")
 
-local data={
-	--rng=nil
+local data = {
+	--rng = nil
 }
 
 function init()
-	--data.rng=M_lrandom.new(os.time())
+	--data.rng = M_lrandom.new(os.time())
 	math.randomseed(os.time())
 end
 
@@ -21,22 +21,22 @@ function ternary(cond, x, y)
 end
 
 function optional(value, default)
-	return (nil~=value)
+	return (nil ~= value)
 		and value
 		or default
 end
 
 function tcheck(x, tc, opt)
-	opt=Util.optional(opt, false)
+	opt = Util.optional(opt, false)
 	assert(
-		tc==type(x)
-		or (opt and nil==x)
+		tc == type(x)
+		or (opt and nil == x)
 	)
 end
 
 function tcheck_obj(x, tc, opt)
-	opt=Util.optional(opt, false)
-	if nil==x then
+	opt = Util.optional(opt, false)
+	if nil == x then
 		assert(opt)
 	else
 		if not x:typeOf(tc) then
@@ -46,12 +46,18 @@ function tcheck_obj(x, tc, opt)
 end
 
 function last(table)
-	assert(0<#table)
+	assert(0 < #table)
 	return table[#table]
 end
 
+function debug_sub(sub, msg, ...)
+	if true == sub then
+		print("debug: "..msg, ...)
+	end
+end
+
 function debug(msg, ...)
-	if true==State.debug_mode then
+	if true == State.gen_debug then
 		print("debug: "..msg, ...)
 	end
 end
@@ -66,7 +72,7 @@ function choose_random(table)
 end
 
 function new_object(class, ...)
-	local obj={}
+	local obj = {}
 	setmetatable(obj, class)
 
 	obj:__init(...)
@@ -76,9 +82,9 @@ end
 -- takes:
 --	(rgba, alpha_opt),
 --	(rgb, alpha), or
---	(rgb) with alpha=255
+--	(rgb) with alpha = 255
 function set_color_table(rgb, alpha)
-	alpha=Util.optional(
+	alpha = Util.optional(
 		alpha,
 		Util.optional(rgb[4], 255)
 	)
