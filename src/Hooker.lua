@@ -88,6 +88,20 @@ function clear()
 	data.active = {}
 end
 
+function clear_specific(props)
+	local rmkeys = {}
+	for idx, hkl in ipairs(data.active) do
+		if hkl.props == props then
+			table.insert(rmkeys, 1, idx)
+		end
+	end
+	if 0 < #rmkeys then
+		for _, idx in pairs(rmkeys) do
+			table.remove(data.active, idx)
+		end
+	end
+end
+
 function spawn(props, x, y)
 	local hkl = Util.new_object(Hooklet, props, x, y)
 	table.insert(data.active, hkl)
@@ -95,14 +109,14 @@ end
 
 function update(dt)
 	local rmkeys = {}
-	for k, hooklet in pairs(data.active) do
+	for idx, hooklet in pairs(data.active) do
 		if not hooklet:update(dt) then
-			table.insert(rmkeys, k)
+			table.insert(rmkeys, 1, idx)
 		end
 	end
 	if 0 < #rmkeys then
-		for _, v in pairs(rmkeys) do
-			table.remove(data.active, v)
+		for _, idx in pairs(rmkeys) do
+			table.remove(data.active, idx)
 		end
 	end
 end
