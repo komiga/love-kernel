@@ -1,0 +1,22 @@
+{
+	"folders":
+	[
+		{
+			"name": "Root",
+			"path": "./",
+			"folder_exclude_patterns": ["asset", "src"]
+		},
+		{
+			"name": "- Asset",
+			"path": "./asset/"
+		},
+		{
+			"name": "- Source",
+			"path": "./src/"
+		}
+	],
+	"settings":
+	{
+		"tab_size": 4
+	}
+}
