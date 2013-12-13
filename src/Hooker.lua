@@ -38,14 +38,13 @@ end
 function Hooklet:render()
 	Util.set_color_table(self.props.color, self.fields.alpha)
 	Gfx.setFont(self.props.font)
-
-	Gfx.translate(self.x + self.fields.tx, self.y + self.fields.ty)
-	Gfx.rotate(self.fields.angle)
-	Gfx.scale(self.fields.sx, self.fields.sy)
 	Gfx.print(
 		self.props.text,
-		-self.props.half_width,
-		-self.props.half_height
+		self.x + self.fields.tx,
+		self.y + self.fields.ty,
+		self.fields.angle,
+		self.fields.sx, self.fields.sy,
+		self.props.half_width, self.props.half_height
 	)
 end
 
