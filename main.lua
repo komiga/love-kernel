@@ -21,9 +21,9 @@ function love.update(elapsed)
 end
 
 function love.draw()
-	love.graphics.clear()
+	Gfx.clear()
 	Core.render()
-	love.graphics.present()
+	Gfx.present()
 end
 
 function love.quit()
