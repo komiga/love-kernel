@@ -73,6 +73,7 @@ end
 
 local function trigger(bind, ident, dt, kind)
 	if
+		true == bind.system or
 		true == exec_gate(bind, ident, dt, kind) or
 		true == bind.passthrough
 	then
