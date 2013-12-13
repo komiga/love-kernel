@@ -116,12 +116,24 @@ function init(x, y, x_speed, y_speed)
 	return data.cam
 end
 
+function srel_x(x)
+	return data.cam.x - Core.display_width_half + x
+end
+
+function srel_y(y)
+	return data.cam.y - Core.display_height_half + y
+end
+
 function rel_x(x)
-	return x - data.cam.x
+	return x + data.cam.x
 end
 
 function rel_y(y)
-	return y - data.cam.y
+	return y + data.cam.y
+end
+
+function srel(x, y)
+	return rel_x(x), rel_y(y)
 end
 
 function rel(x, y)
