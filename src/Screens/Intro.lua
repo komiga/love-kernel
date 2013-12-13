@@ -137,8 +137,20 @@ function Impl:notify_pushed()
 	self:reset()
 end
 
+function Impl:notify_became_top()
+end
+
 function Impl:notify_popped()
 	Util.debug("Intro:notify_popped")
+end
+
+function Impl:bind_gate(bind, ident, dt, kind)
+	if kind == Bind.Kind.Release then
+		self:terminate()
+		return false
+	else
+		return false
+	end
 end
 
 function Impl:update(dt)
@@ -170,7 +182,6 @@ function Impl:update(dt)
 				self.mode = Mode.Stay
 				self.stay_timer:reset(self:current_seq().stay)
 			else
-				Util.debug("Intro:update: Mode.In, idx: ", self.seq_idx)
 				self.seq_idx = self.seq_idx + 1
 				if not self:is_seq_finished() then
 					self.mode = Mode.In
@@ -207,15 +218,6 @@ function Impl:render()
 			Core.display_width_half - (w / 2),
 			Core.display_height_half - (h / 2)
 		)
-	end
-end
-
-function Impl:bind_gate(bind, ident, dt, kind)
-	if kind == Bind.Kind.Release then
-		self:terminate()
-		return false
-	else
-		return false
 	end
 end
 

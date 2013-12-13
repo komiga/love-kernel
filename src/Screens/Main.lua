@@ -98,23 +98,48 @@ function Impl:__init()
 		i1 = 1, i2 = 2,
 		i3 = 3, i4 = 4
 	}
+	self.pending_pause = false
 end
 
 function Impl:push_intro()
 	Screen.push(IntroScreen.new(
 		Asset.intro_seq,
 		Asset.atlas.intro_seq,
-		true,
-		true
+		false,
+		false
 	))
+end
+
+function Impl:pause(on)
+	if not State.pause_lock then
+		if self.screen_unit:is_top() then
+			Core.pause(on)
+		else
+			self.pending_pause = true
+		end
+	end
 end
 
 function Impl:notify_pushed()
 	self:push_intro()
 end
 
+function Impl:notify_became_top()
+	if self.pending_pause then
+		self.pending_pause = false
+		Core.pause(true)
+	end
+end
+
 function Impl:notify_popped()
 	Hooker.clear_specific(Asset.hooklets.KUMQUAT)
+end
+
+function Impl:bind_gate(bind, ident, dt, kind)
+	--if "escape" == ident then
+	--	return true
+	--end
+	return not State.paused
 end
 
 function Impl:update(dt)
@@ -174,13 +199,6 @@ function Impl:render()
 	Camera.unlock()
 end
 
-function Impl:bind_gate(bind, ident, dt, kind)
-	if "escape" == ident then
-		return true
-	end
-	return not State.paused
-end
-
 -- MainScreen interface
 
 local function __static_init()
@@ -206,6 +224,7 @@ function init(_)
 	assert(not data.__initialized)
 	data.instance = new(false)
 	data.impl = data.instance.impl
+	Core.set_focus_fn(focus_changed)
 	data.__initialized = true
 
 	return data.instance
@@ -213,4 +232,10 @@ end
 
 function get_instance()
 	return data.instance
+end
+
+function focus_changed(focused)
+	if not State.pause_lock then
+		data.impl:pause(not focused)
+	end
 end

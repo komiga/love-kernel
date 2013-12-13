@@ -34,21 +34,6 @@ data.bind_table = {
 				Camera.srel_y(HID.Mouse.getY())
 			)
 		end
-	},
-	[{"up", "down", "left", "right"}] = {
-		on_active = true,
-		handler = function(ident, _, _, _)
-			local xm, ym = 40.0, 40.0
-			if "up" == ident then
-				Camera.move(0.0, -ym)
-			elseif "down" == ident then
-				Camera.move(0.0,  ym)
-			elseif "left" == ident then
-				Camera.move(-xm, 0.0)
-			elseif "right" == ident then
-				Camera.move( xm, 0.0)
-			end
-		end
 	}
 }
 
@@ -65,13 +50,26 @@ function Impl:notify_pushed()
 	-- TODO: PUSH-INIT
 end
 
+function Impl:notify_became_top()
+end
+
 function Impl:notify_popped()
 	-- TODO: POP-DEINIT
 end
 
+function Impl:focus_changed(focused)
+	if not State.pause_lock then
+		Core.pause(not focused)
+	end
+end
+
+function Impl:bind_gate(bind, ident, dt, kind)
+	return not State.paused
+end
+
 function Impl:update(dt)
 	if not State.paused then
-		-- TODO: UPDATE THINGS
+		-- TODO: UPDATE THE THINGS
 	end
 end
 
@@ -81,10 +79,6 @@ function Impl:render()
 	-- TODO: RENDER ALL THE THINGS
 
 	Camera.unlock()
-end
-
-function Impl:bind_gate(bind, ident, dt, kind)
-	return not State.paused
 end
 
 -- STUBScreen interface

@@ -34,12 +34,22 @@ function Unit:is_transparent()
 	return self.transparent
 end
 
+function Unit:is_top()
+	return current() == self
+end
+
 function Unit:notify_pushed()
 	if nil ~= self.bind_group then
 		Bind.push_group(self.bind_group)
 	end
 	if nil ~= self.impl.notify_pushed then
 		self.impl:notify_pushed()
+	end
+end
+
+function Unit:notify_became_top()
+	if nil ~= self.impl.notify_became_top then
+		self.impl:notify_became_top()
 	end
 end
 
@@ -93,13 +103,18 @@ function push(screen)
 end
 
 function pop(screen)
-	if 0 == #data.stack then
+	if 0 == count() then
 		Util.debug("Screen.pop(): attempted to pop on empty stack")
 	end
 	assert(nil ~= screen and screen == current())
 
 	table.remove(data.stack)
 	screen:notify_popped()
+
+	screen = current()
+	if nil ~= screen then
+		screen:notify_became_top()
+	end
 end
 
 function clear()
