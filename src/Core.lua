@@ -14,7 +14,8 @@ require("src/Screens/Main")
 require("src/Screens/Intro")
 
 local data = {
-	bind_table = nil
+	bind_table = nil,
+	focus_fn = nil
 }
 
 Core.display_width = nil
@@ -93,6 +94,18 @@ function init(args)
 				end
 			end
 		}
+		data.bind_table["f6"] = {
+			on_release = true,
+			system = true,
+			handler = function(_, _, _, _)
+				State.gfx_debug = not State.gfx_debug_cross
+				if State.gfx_debug_cross then
+					print("graphics crosshair debug mode enabled")
+				else
+					print("graphics crosshair debug mode disabled")
+				end
+			end
+		}
 	end
 
 	-- system initialization
@@ -140,9 +153,13 @@ function pause(paused)
 	end
 end
 
+function set_focus_fn(fn)
+	data.focus_fn = fn
+end
+
 function focus_changed(focused)
-	if not State.pause_lock then
-		pause(not focused)
+	if nil ~= data.focus_fn then
+		data.focus_fn(focused)
 	end
 end
 
@@ -163,11 +180,14 @@ function render()
 	if State.gfx_debug then
 		Gfx.setColor(192,192,192, 200)
 		-- Full quad
-		--[[Gfx.rectangle("line",
+		Gfx.rectangle("line",
 			0.0,0.0,
 			Core.display_width, Core.display_height
-		)--]]
+		)
+	end
 
+	if State.gfx_debug_cross then
+		Gfx.setColor(192,192,192, 200)
 		-- Top left
 		Gfx.rectangle("line",
 			0.0,0.0,
