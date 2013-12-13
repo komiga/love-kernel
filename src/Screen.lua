@@ -53,7 +53,7 @@ end
 
 function Unit:bind_gate(bind, ident, dt, kind)
 	if nil ~= self.impl.bind_gate then
-		self.impl:bind_gate(bind, ident, dt, kind)
+		return self.impl:bind_gate(bind, ident, dt, kind)
 	end
 	return false
 end
@@ -104,7 +104,7 @@ end
 function bind_gate(bind, ident, dt, kind)
 	local screen = current()
 	if nil ~= screen then
-		screen:bind_gate(bind, ident, dt, kind)
+		return screen:bind_gate(bind, ident, dt, kind)
 	end
 	return false
 end
