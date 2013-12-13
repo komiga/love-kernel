@@ -46,10 +46,14 @@ local BadGateKeys = {
 
 local data = {
 	__initialized = false,
-	binds = nil,
+	global_group = nil,
 	gate_fn = nil,
-	active = nil
+	stack = nil,
+	active = nil,
+	mouse_enabled = nil
 }
+
+-- internal
 
 local function make_bind(check, ident, bind, table)
 	if true == check[ident] then
@@ -79,7 +83,7 @@ local function trigger(bind, ident, dt, kind)
 end
 
 local function bind_press(ident, _)
-	local bind = data.binds[ident]
+	local bind = get_bind(ident)
 	if nil ~= bind then
 		if bind.on_press then
 			trigger(bind, ident, 0.0, Kind.Press)
@@ -95,7 +99,7 @@ local function bind_press(ident, _)
 end
 
 local function bind_release(ident)
-	local bind = data.binds[ident]
+	local bind = get_bind(ident)
 	if nil ~= bind then
 		if bind.on_active and exec_gate(bind, ident, 0.0, Kind.Active) then
 			data.active[ident] = nil
@@ -110,21 +114,32 @@ local function bind_release(ident)
 	end
 end
 
--- Bind interface
+-- class BindGroup
 
-function init(bind_table, gate_fn)
+local BindGroup = {}
+BindGroup.__index = BindGroup
+
+function BindGroup:__init(bind_table)
 	Util.tcheck(bind_table, "table")
-	Util.tcheck(gate_fn, "function")
 
-	assert(not data.__initialized)
+	self.bind_table = {}
+	self:add(bind_table)
+end
 
-	data.binds = bind_table
-	data.gate_fn = gate_fn
-	data.active = {}
+function BindGroup:has_ident(ident)
+	return nil ~= self.bind_table[ident]
+end
+
+function BindGroup:get_bind(ident)
+	return self.bind_table[ident]
+end
+
+function BindGroup:add(bind_table)
+	Util.tcheck(bind_table, "table")
 
 	local check = {}
 	local expanded = {}
-	for ident, bind in pairs(data.binds) do
+	for ident, bind in pairs(bind_table) do
 		Util.tcheck(bind, "table")
 		bind.ident = ident
 		if "table" == type(ident) then
@@ -136,18 +151,81 @@ function init(bind_table, gate_fn)
 		end
 	end
 	for ident, bind in pairs(expanded) do
-		data.binds[ident] = bind
+		self.bind_table[ident] = bind
 	end
+end
+
+-- Bind interface
+
+function tcheck(group, opt)
+	opt = Util.optional(opt, false)
+	Util.tcheck(group, "table", opt)
+	assert((not group and opt) or BindGroup == group.__index)
+end
+
+function new_group(bind_table)
+	return Util.new_object(BindGroup, bind_table)
+end
+
+function init(global_group, gate_fn, enable_mouse)
+	Util.tcheck(global_group, "table")
+	Util.tcheck(gate_fn, "function")
+	Util.tcheck(enable_mouse, "boolean", true)
+
+	assert(not data.__initialized)
+
+	data.global_group = new_group(global_group)
+	data.gate_fn = gate_fn
+	data.stack = {}
+	data.active = {}
+	data.mouse_enabled = Util.optional(enable_mouse, true)
 
 	data.__initialized = true
+end
+
+function count()
+	return #data.stack
 end
 
 function set_gate(gate_fn)
 	data.gate_fn = gate_fn
 end
 
+function push_group(group)
+	Bind.tcheck(group)
+
+	table.insert(data.stack, group)
+end
+
+function pop_group(group)
+	assert(0 < count())
+	Bind.tcheck(group)
+
+	assert(group == data.stack[count()])
+	table.remove(data.stack)
+end
+
+function active_group()
+	return Util.ternary(
+		0 < count(),
+		data.stack[count()],
+		data.global_group
+	)
+end
+
 function is_active(native)
 	return nil ~= data.active[native]
+end
+
+function get_bind(ident)
+	local bind = nil
+	for idx = count(), 1, -1 do
+		bind = data.stack[idx]:get_bind(ident)
+		if nil ~= bind then
+			break
+		end
+	end
+	return bind or data.global_group:get_bind(ident)
 end
 
 function mouse_press(_, _, button)
@@ -186,9 +264,13 @@ end
 -- NB: For some reason disabling the mouse module does not disable
 -- mouse events..
 function love.mousepressed(x, y, button)
-	--Bind.mouse_press(x, y, button)
+	if data.mouse_enabled then
+		Bind.mouse_press(x, y, button)
+	end
 end
 
 function love.mousereleased(x, y, button)
-	--Bind.mouse_release(x, y, button)
+	if data.mouse_enabled then
+		Bind.mouse_release(x, y, button)
+	end
 end

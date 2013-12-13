@@ -2,7 +2,7 @@
 module("State", package.seeall)
 
 gen_debug = true
-gfx_debug = false
+gfx_debug = true
 sfx_debug = false
 
 paused = false
