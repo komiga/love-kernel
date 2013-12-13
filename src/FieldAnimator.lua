@@ -33,7 +33,9 @@ function Unit:is_complete()
 	return 1.0 <= self.total
 end
 
-function Unit:reset()
+function Unit:reset(new_duration)
+	Util.tcheck(new_duration, "number", true)
+	self.duration = Util.optional(new_duration, self.duration)
 	self.time = 0.0
 	self.total = 0.0
 	self.picked = {}
