@@ -7,7 +7,6 @@ require("src/Bind")
 require("src/Screen")
 require("src/Camera")
 require("src/AudioManager")
-require("src/FieldAnimator")
 require("src/Hooker")
 require("src/Animator")
 require("src/AssetLoader")
@@ -17,10 +16,19 @@ local data = {
 	__initialized = false,
 
 	bind_table = nil,
+	bind_group = nil,
+	impl = nil,
 	instance = nil
 }
 
 data.bind_table = {
+	["escape"] = {
+		on_release = true,
+		passthrough = false,
+		handler = function(_, _, _, _)
+			Event.quit()
+		end
+	},
 	["mouse1"] = {
 		on_active = true,
 		handler = function(_, _, _, _)
@@ -60,19 +68,23 @@ data.bind_table = {
 	["c"] = {
 		on_release = true,
 		handler = function(_, _, _, _)
-			Hooker.clear()
+			Hooker.clear_specific(Asset.hooklets.KUMQUAT)
+		end
+	},
+	["i"] = {
+		on_release = true,
+		handler = function(_, _, _, _)
+			data.impl:push_intro()
 		end
 	}
 }
 
--- class Unit
+-- class Impl
 
-local Unit = {}
-Unit.__index = Unit
+local Impl = {}
+Impl.__index = Impl
 
-function Unit:__init()
-	self.bind_group = Bind.new_group(data.bind_table)
-
+function Impl:__init()
 	local anim_data = Asset.anim.moving_square
 	self.batcher = Animator.batcher(
 		anim_data, 4, Animator.BatchMode.Dynamic
@@ -88,15 +100,31 @@ function Unit:__init()
 	}
 end
 
-function Unit:notify_pushed()
+function Impl:push_intro()
+	Screen.push(IntroScreen.new(
+		Asset.intro_seq,
+		Asset.atlas.intro_seq,
+		true,
+		true
+	))
 end
 
-function Unit:notify_popped()
-	self.batcher = nil
-	self.moving_square = nil
+function Impl:notify_pushed()
+	self:push_intro()
 end
 
-function Unit:update(dt)
+function Impl:notify_popped()
+	Hooker.clear_specific(Asset.hooklets.KUMQUAT)
+end
+
+function Impl:update(dt)
+	if State.paused then
+		return
+	end
+
+	Camera.update(dt)
+	Hooker.update(dt)
+
 	self.moving_square[1]:update(dt)
 	self.moving_square[2]:update(dt)
 	self.moving_square[3]:update(dt)
@@ -108,7 +136,7 @@ function Unit:update(dt)
 	end
 end
 
-function Unit:render()
+function Impl:render()
 	Camera.lock()
 
 	local b, a, t
@@ -146,19 +174,43 @@ function Unit:render()
 	Camera.unlock()
 end
 
-function Unit:bind_gate(bind, ident, dt, kind)
-	return false
+function Impl:bind_gate(bind, ident, dt, kind)
+	if "escape" == ident then
+		return true
+	end
+	return not State.paused
 end
 
 -- MainScreen interface
 
-function init()
+local function __static_init()
+	Camera.init(
+		Core.display_width_half, Core.display_height_half,
+		400.0, 400.0
+	)
+
+	if not data.bind_group then
+		data.bind_group = Bind.new_group(data.bind_table)
+	end
+	Hooker.init(Asset.hooklets, Asset.font.main)
+end
+
+local function new(transparent)
+	__static_init()
+
+	local impl = Util.new_object(Impl)
+	return Screen.new(impl, data.bind_group, transparent)
+end
+
+function init(_)
 	assert(not data.__initialized)
-
-	local impl = Util.new_object(Unit)
-	data.instance = Screen.new(impl, impl.bind_group, false)
-
+	data.instance = new(false)
+	data.impl = data.instance.impl
 	data.__initialized = true
 
+	return data.instance
+end
+
+function get_instance()
 	return data.instance
 end

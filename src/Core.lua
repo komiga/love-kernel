@@ -11,6 +11,7 @@ require("src/Animator")
 require("src/AssetLoader")
 
 require("src/Screens/Main")
+require("src/Screens/Intro")
 
 local data = {
 	bind_table = nil
@@ -23,36 +24,26 @@ Core.display_height_half = nil
 
 data.bind_table = {
 -- System
-	["escape"] = {
-		on_release = true,
-		handler = function(_, _, _, _)
-			Event.quit()
-		end
-	},
 	["pause"] = {
 		on_release = true,
-		passthrough = true,
+		system = true,
 		handler = function(_, _, _, _)
-			State.pause_lock = not State.pause_lock
-			State.paused = State.pause_lock
-			if State.paused then
-				AudioManager.pause()
-			else
-				AudioManager.resume()
-			end
+			local paused = not State.pause_lock
+			State.pause_lock = false
+			Core.pause(paused)
+			State.pause_lock = paused
 		end
 	}
 }
 
-function bind_trigger_gate(bind, ident, dt, kind)
-	if false == State.paused then
-		return true
-	else
-		return Screen.bind_gate(bind, ident, dt, kind)
+function bind_gate(bind, ident, dt, kind)
+	if State.paused then
+		return false
 	end
+	return Screen.bind_gate(bind, ident, dt, kind)
 end
 
-function init(_)
+function init(args)
 	-- Ensure debug is enabled for initialization
 	local debug_mode_temp = false
 	if not State.gen_debug then
@@ -68,6 +59,7 @@ function init(_)
 	if not debug_mode_temp then
 		data.bind_table["f1"] = {
 			on_release = true,
+			system = true,
 			handler = function(_, _, _, _)
 				State.gen_debug = not State.gen_debug
 				if State.gen_debug then
@@ -79,6 +71,7 @@ function init(_)
 		}
 		data.bind_table["f2"] = {
 			on_release = true,
+			system = true,
 			handler = function(_, _, _, _)
 				State.gfx_debug = not State.gfx_debug
 				if State.gfx_debug then
@@ -90,6 +83,7 @@ function init(_)
 		}
 		data.bind_table["f3"] = {
 			on_release = true,
+			system = true,
 			handler = function(_, _, _, _)
 				State.sfx_debug = not State.sfx_debug
 				if State.sfx_debug then
@@ -103,28 +97,22 @@ function init(_)
 
 	-- system initialization
 	Util.init()
-	Bind.init(data.bind_table, bind_trigger_gate, true)
+	Bind.init(data.bind_table, bind_gate, true)
 
 	-- assets
 	AssetLoader.load("asset/", Asset.desc_root, Asset)
 	AudioManager.init(Asset.sound)
 
 	-- more systems
-	Camera.init(
-		Core.display_width_half, Core.display_height_half,
-		320.0, 320.0
-	)
-
-	Hooker.init(Asset.hooklets, Asset.font.main)
 	Animator.init(Asset.anim)
+	Screen.init()
 
 	-- default rendering state
 	Gfx.setFont(Asset.font.main)
 	Gfx.setColor(255,255,255, 255)
 	Gfx.setBackgroundColor(0,0,0, 255)
 
-	Screen.init()
-	Screen.push(MainScreen.init())
+	Screen.push(MainScreen.init(args))
 
 	-- Ensure debug is disabled after initialization
 	if debug_mode_temp then
@@ -133,6 +121,7 @@ function init(_)
 end
 
 function deinit()
+	Screen.clear()
 end
 
 function exit()
@@ -140,9 +129,20 @@ function exit()
 	return true
 end
 
+function pause(paused)
+	if not State.pause_lock then
+		State.paused = paused
+		if State.paused then
+			AudioManager.pause()
+		else
+			AudioManager.resume()
+		end
+	end
+end
+
 function focus_changed(focused)
 	if not State.pause_lock then
-		State.paused = not focused
+		pause(not focused)
 	end
 end
 
@@ -150,23 +150,43 @@ function update(dt)
 	if true == State.paused then
 		Bind.update(0.0)
 	else
-		Camera.update(dt)
 		Bind.update(dt)
-		Hooker.update(dt)
 		AudioManager.update(dt)
-		Screen.update(dt)
 	end
+	Screen.update(dt)
 end
 
 function render()
 	Gfx.setColor(255,255,255, 255)
-
 	Screen.render()
 
 	if State.gfx_debug then
-		Gfx.setColor(255,255,255, 255)
+		Gfx.setColor(192,192,192, 200)
+		-- Full quad
+		--[[Gfx.rectangle("line",
+			0.0,0.0,
+			Core.display_width, Core.display_height
+		)--]]
+
+		-- Top left
 		Gfx.rectangle("line",
-			0.0,0.0, Core.display_width, Core.display_height
+			0.0,0.0,
+			Core.display_width_half, Core.display_height_half
+		)
+		-- Top Right
+		Gfx.rectangle("line",
+			Core.display_width_half, 0.0,
+			Core.display_width_half, Core.display_height_half
+		)
+		-- Bottom left
+		Gfx.rectangle("line",
+			0.0, Core.display_height_half,
+			Core.display_width_half, Core.display_height_half
+		)
+		-- Bottom Right
+		Gfx.rectangle("line",
+			Core.display_width_half, Core.display_height_half,
+			Core.display_width_half, Core.display_height_half
 		)
 	end
 end

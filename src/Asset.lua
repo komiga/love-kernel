@@ -16,6 +16,12 @@ font = {
 },
 
 atlas = {
+	intro_seq = {
+		tex = {
+			{"komiga", 0,0, 256,256},
+			{"disclaimer", 0,256, 512,256},
+		}
+	},
 	sprites = {
 		indexed = true,
 		size = {32,32},
@@ -44,6 +50,13 @@ sound = {
 	}
 }
 
+} -- desc_root
+
+-- intro sequences
+
+intro_seq = {
+	{name = "komiga"    , fade = 0.5, stay = 0.5},
+	{name = "disclaimer", fade = 0.5, stay = 2.0}
 }
 
 -- hooklets

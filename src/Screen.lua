@@ -25,6 +25,7 @@ function Unit:__init(impl, bind_group, transparent)
 	Util.tcheck(transparent, "boolean", true)
 
 	self.impl = impl
+	self.impl.screen_unit = self
 	self.bind_group = bind_group
 	self.transparent = Util.optional(transparent, false)
 end
@@ -38,7 +39,7 @@ function Unit:notify_pushed()
 		Bind.push_group(self.bind_group)
 	end
 	if nil ~= self.impl.notify_pushed then
-		self.impl.notify_pushed()
+		self.impl:notify_pushed()
 	end
 end
 
@@ -47,7 +48,7 @@ function Unit:notify_popped()
 		Bind.pop_group(self.bind_group)
 	end
 	if nil ~= self.impl.notify_popped then
-		self.impl.notify_popped()
+		self.impl:notify_popped()
 	end
 end
 
@@ -55,7 +56,7 @@ function Unit:bind_gate(bind, ident, dt, kind)
 	if nil ~= self.impl.bind_gate then
 		return self.impl:bind_gate(bind, ident, dt, kind)
 	end
-	return false
+	return true
 end
 
 function Unit:update(dt)
@@ -83,22 +84,28 @@ function count()
 end
 
 function current()
-	return data.stack[count()]
+	return 0 < count() and data.stack[count()] or nil
 end
 
 function push(screen)
-	screen:notify_pushed()
 	table.insert(data.stack, screen)
+	screen:notify_pushed()
 end
 
 function pop(screen)
 	if 0 == #data.stack then
 		Util.debug("Screen.pop(): attempted to pop on empty stack")
 	end
-	assert(screen == current())
+	assert(nil ~= screen and screen == current())
 
-	screen:notify_popped()
 	table.remove(data.stack)
+	screen:notify_popped()
+end
+
+function clear()
+	while 0 ~= count() do
+		pop(current())
+	end
 end
 
 function bind_gate(bind, ident, dt, kind)
@@ -106,7 +113,7 @@ function bind_gate(bind, ident, dt, kind)
 	if nil ~= screen then
 		return screen:bind_gate(bind, ident, dt, kind)
 	end
-	return false
+	return true
 end
 
 function update(dt)
