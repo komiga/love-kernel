@@ -17,7 +17,7 @@ M.data = M.data or {
 	focus_fn = nil
 }
 
-M.data.bind_table = {
+M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
 -- System
 	["pause"] = {
 		on_release = true,
@@ -29,7 +29,7 @@ M.data.bind_table = {
 			State.pause_lock = paused
 		end
 	}
-}
+})
 
 function M.bind_gate(bind, ident, dt, kind)
 	if State.paused then

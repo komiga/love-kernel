@@ -24,7 +24,7 @@ M.data = M.data or {
 	instance = nil
 }
 
-M.data.bind_table = {
+M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
 	["escape"] = {
 		on_release = true,
 		passthrough = false,
@@ -106,7 +106,7 @@ M.data.bind_table = {
 			M.data.impl:push_intro()
 		end
 	}
-}
+})
 
 -- class Impl
 

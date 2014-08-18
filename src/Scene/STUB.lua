@@ -25,7 +25,7 @@ M.data = M.data or {
 	--]]
 }
 
-M.data.bind_table = {
+M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
 	["mouse1"] = {
 		on_active = true,
 		handler = function(_, _, _, _)
@@ -35,7 +35,7 @@ M.data.bind_table = {
 			)
 		end
 	}
-}
+})
 
 -- class Impl
 
