@@ -1,5 +1,4 @@
 
---module("MainScreen", package.seeall)
 MainScreen = MainScreen or {}
 local M = MainScreen
 
@@ -96,17 +95,14 @@ M.Impl = Util.class(M.Impl)
 
 function M.Impl:__init()
 	local anim_data = Asset.anim.moving_square
-	self.batcher = Animator.batcher(
+	self.batcher = Animator.Batcher(
 		anim_data, 4, Animator.BatchMode.Dynamic
 	)
 	self.moving_square = {
-		Animator.instance(anim_data, 1, Animator.Mode.Loop),
-		Animator.instance(anim_data, 2, Animator.Mode.Loop),
-		Animator.instance(anim_data, 1, Animator.Mode.Loop),
-		Animator.instance(anim_data, 2, Animator.Mode.Loop),
-		data = anim_data,
-		i1 = 1, i2 = 2,
-		i3 = 3, i4 = 4
+		Animator.Instance(anim_data, 1, Animator.Mode.Bounce),
+		Animator.Instance(anim_data, 2, Animator.Mode.Bounce),
+		Animator.Instance(anim_data, 1, Animator.Mode.Bounce),
+		Animator.Instance(anim_data, 2, Animator.Mode.Bounce)
 	}
 	self.pending_pause = false
 end
@@ -131,7 +127,7 @@ function M.Impl:pause(on)
 end
 
 function M.Impl:notify_pushed()
-	self:push_intro()
+	-- self:push_intro()
 end
 
 function M.Impl:notify_became_top()
@@ -160,14 +156,8 @@ function M.Impl:update(dt)
 	Camera.update(dt)
 	Hooker.update(dt)
 
-	self.moving_square[1]:update(dt)
-	self.moving_square[2]:update(dt)
-	self.moving_square[3]:update(dt)
-	if not self.moving_square[4]:update(dt) then
-		self.moving_square.i1, self.moving_square.i2 =
-		self.moving_square.i2, self.moving_square.i1
-		self.moving_square.i3, self.moving_square.i4 =
-		self.moving_square.i4, self.moving_square.i3
+	for _, anim in ipairs(self.moving_square) do
+		anim:update(dt)
 	end
 end
 
@@ -190,10 +180,10 @@ function M.Impl:render()
 	Gfx.push()
 	--Gfx.translate(-32.0, 0.0)
 	b:batch_begin()
-		b:add(a[a.i1], 32, 32)
-		b:add(a[a.i2], 32, 64)
-		b:add(a[a.i3], 64, 64)
-		b:add(a[a.i4], 64, 32)
+		b:add(a[1], 32, 32)
+		b:add(a[2], 32, 64)
+		b:add(a[3], 64, 64)
+		b:add(a[4], 64, 32)
 	b:batch_end()
 	b:render()
 	Gfx.pop()

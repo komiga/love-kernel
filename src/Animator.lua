@@ -178,11 +178,3 @@ function M.init(anim_table)
 
 	M.data.__initialized = true
 end
-
-function M.batcher(ad, limit, mode)
-	return Util.new_object(M.AnimBatcher, ad, limit, mode)
-end
-
-function M.instance(ad, sindex, mode)
-	return Util.new_object(M.AnimInstance, ad, sindex, mode)
-end
