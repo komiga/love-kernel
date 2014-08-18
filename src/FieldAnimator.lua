@@ -119,3 +119,5 @@ end
 function M.new(duration, fields, trans, mode, serial_reset_callback)
 	return new_object(M.Unit, duration, fields, trans, mode, serial_reset_callback)
 end
+
+return M

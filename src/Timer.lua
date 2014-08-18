@@ -53,3 +53,5 @@ end
 function M.new(duration)
 	return new_object(M.Unit, duration)
 end
+
+return M

@@ -192,3 +192,5 @@ function M.update(dt)
 		end
 	end
 end
+
+return M

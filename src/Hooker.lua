@@ -128,3 +128,5 @@ function M.render()
 		Gfx.pop()
 	end
 end
+
+return M

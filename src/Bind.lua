@@ -304,3 +304,5 @@ function love.mousereleased(x, y, button)
 		Bind.mouse_release(x, y, button)
 	end
 end
+
+return M

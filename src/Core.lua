@@ -205,3 +205,5 @@ function M.render()
 		)
 	end
 end
+
+return M

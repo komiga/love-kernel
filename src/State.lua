@@ -1,5 +1,6 @@
 
 State = State or {}
+local M = State
 
 State.gen_debug = true
 State.gfx_debug = true
@@ -10,3 +11,5 @@ State.paused = false
 State.pause_lock = false
 
 State.auto_reload = true
+
+return M

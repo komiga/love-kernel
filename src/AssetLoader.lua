@@ -353,3 +353,5 @@ function M.load(root_path, desc_root, asset_table)
 		end
 	end
 end
+
+return M

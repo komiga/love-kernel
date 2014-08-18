@@ -132,3 +132,5 @@ function set_color_table(rgb, alpha)
 	)
 	Gfx.setColor(rgb[1],rgb[2],rgb[3], alpha)
 end
+
+return M

@@ -178,3 +178,5 @@ function M.init(anim_table)
 
 	M.data.__initialized = true
 end
+
+return M

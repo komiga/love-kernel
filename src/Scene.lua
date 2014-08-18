@@ -150,3 +150,5 @@ function M.render()
 		scene:render()
 	end
 end
+
+return M

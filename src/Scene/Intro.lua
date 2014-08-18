@@ -229,3 +229,5 @@ function M.new(seq, atlas, soft, transparent)
 	local impl = new_object(M.Impl, seq, atlas, soft)
 	return Scene.new(impl, nil, transparent)
 end
+
+return M

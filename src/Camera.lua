@@ -174,3 +174,5 @@ end
 function M.unlock()
 	M.data.cam:unlock()
 end
+
+return M

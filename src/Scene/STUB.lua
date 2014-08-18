@@ -113,3 +113,5 @@ function M.get_instance()
 end
 
 --]]
+
+return M
