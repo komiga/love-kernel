@@ -30,8 +30,10 @@ end
 function type_assert(x, tc, opt)
 	opt = optional(opt, false)
 	assert(
-		tc == type(x)
-		or (opt and nil == x)
+		(opt and nil == x)
+		or type(tc) == "table"
+			and tc == x.__index
+			or  tc == type(x)
 	)
 end
 
