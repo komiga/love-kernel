@@ -70,6 +70,10 @@ function log(...)
 	print(...)
 end
 
+function trace()
+	log(get_trace() .. ": TRACE")
+end
+
 function log_traced(msg, ...)
 	log(get_trace() .. ": " .. msg, ...)
 end
