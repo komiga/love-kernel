@@ -13,7 +13,7 @@ require("src/Animator")
 require("src/AssetLoader")
 require("src/Asset")
 
-local data = {
+M.data = M.data or {
 	bind_table = nil,
 	bind_group = nil,
 
@@ -25,7 +25,7 @@ local data = {
 	--]]
 }
 
-data.bind_table = {
+M.data.bind_table = {
 	["mouse1"] = {
 		on_active = true,
 		handler = function(_, _, _, _)
@@ -83,8 +83,8 @@ end
 -- STUBScreen interface
 
 local function __static_init()
-	if not data.bind_group then
-		data.bind_group = Bind.new_group(data.bind_table)
+	if not M.data.bind_group then
+		M.data.bind_group = Bind.new_group(M.data.bind_table)
 	end
 end
 
@@ -93,23 +93,23 @@ end
 	__static_init()
 
 	local impl = Util.new_object(M.Impl)
-	return Screen.new(impl, data.bind_group, transparent)
+	return Screen.new(impl, M.data.bind_group, transparent)
 end
 
 -- Singleton
 --[[
 
 function M.init(_)
-	assert(not data.__initialized)
-	data.instance = M.new(false)
-	data.impl = data.instance.impl
-	data.__initialized = true
+	assert(not M.data.__initialized)
+	M.data.instance = M.new(false)
+	M.data.impl = M.data.instance.impl
+	M.data.__initialized = true
 
-	return data.instance
+	return M.data.instance
 end
 
 function M.get_instance()
-	return data.instance
+	return M.data.instance
 end
 
 --]]
