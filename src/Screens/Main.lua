@@ -115,7 +115,7 @@ function Impl:pause(on)
 		if self.screen_unit:is_top() then
 			Core.pause(on)
 		else
-			self.pending_pause = true
+			self.pending_pause = on
 		end
 	end
 end
