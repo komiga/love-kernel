@@ -45,12 +45,26 @@ local BadGateKeys = {
 	["compose"] = true
 }
 
+local Modifier = {
+	["rshift"] = true,
+	["lshift"] = true,
+	["rctrl"] = true,
+	["lctrl"] = true,
+	["ralt"] = true,
+	["lalt"] = true,
+	["rmeta"] = true,
+	["lmeta"] = true,
+	["lsuper"] = true,
+	["rsuper"] = true,
+}
+
 M.data = M.data or {
 	__initialized = false,
 	global_group = nil,
 	gate_fn = nil,
 	stack = nil,
 	active = nil,
+	modifiers = nil,
 	mouse_enabled = nil
 }
 
@@ -85,6 +99,9 @@ local function trigger(bind, ident, dt, kind)
 end
 
 local function bind_press(ident, _)
+	if Modifier[ident] then
+		M.data.modifiers[ident] = true
+	end
 	local bind = Bind.get_bind(ident)
 	if nil ~= bind then
 		if bind.on_press then
@@ -101,6 +118,9 @@ local function bind_press(ident, _)
 end
 
 local function bind_release(ident)
+	if Modifier[ident] then
+		M.data.modifiers[ident] = false
+	end
 	local bind = Bind.get_bind(ident)
 	if nil ~= bind then
 		if bind.on_active and exec_gate(bind, ident, 0.0, Bind.Kind.Active) then
@@ -169,6 +189,7 @@ function M.init(global_group, gate_fn, enable_mouse)
 	M.data.gate_fn = gate_fn
 	M.data.stack = {}
 	M.data.active = {}
+	M.data.modifiers = {}
 	M.data.mouse_enabled = optional(enable_mouse, true)
 
 	M.data.__initialized = true
@@ -205,7 +226,25 @@ function M.active_group()
 end
 
 function M.is_active(native)
-	return nil ~= M.data.active[native]
+	return M.data.active[native]
+end
+
+function M.has_modifiers(...)
+	for _, native in ipairs({...}) do
+		if not M.data.modifiers[native] then
+			return false
+		end
+	end
+	return 0 < #...
+end
+
+function M.has_modifiers_any(...)
+	for _, native in ipairs({...}) do
+		if M.data.modifiers[native] then
+			return true
+		end
+	end
+	return false
 end
 
 function M.get_bind(ident)
