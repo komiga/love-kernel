@@ -143,6 +143,7 @@ M.Group = class(M.Group)
 function M.Group:__init(bind_table)
 	type_assert(bind_table, "table")
 
+	self.bind_table_source = bind_table
 	self.bind_table = {}
 	self:add(bind_table)
 end
@@ -174,6 +175,10 @@ function M.Group:add(bind_table)
 	for ident, bind in pairs(expanded) do
 		self.bind_table[ident] = bind
 	end
+end
+
+function M.Group:replace(replacement)
+	self:__init(replacement)
 end
 
 -- Bind interface
@@ -223,6 +228,26 @@ function M.active_group()
 		M.data.stack[Bind.count()],
 		M.data.global_group
 	)
+end
+
+function M.replace_group(bind_table, replacement)
+	type_assert(bind_table, "table")
+	type_assert(replacement, "table")
+
+	for _, group in ipairs(M.data.stack) do
+		if group.bind_table_source == bind_table then
+			group:replace(replacement)
+			return
+		end
+	end
+	assert(false, "group not found for bind table")
+end
+
+function M.redefine_group(bind_table, replacement)
+	if bind_table then
+		M.replace_group(bind_table, replacement)
+	end
+	return replacement
 end
 
 function M.is_active(native)
