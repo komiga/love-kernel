@@ -83,7 +83,7 @@ function love.run()
 
 		if update_screen then
 			love.draw()
-			Timer.sleep(0.001)
 		end
+		Timer.sleep(0.001)
 	end
 end
