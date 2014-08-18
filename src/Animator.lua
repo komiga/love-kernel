@@ -21,11 +21,11 @@ local BatchModeName = {
 	"stream"
 }
 
--- class AnimInstance
+-- class Instance
 
-M.AnimInstance = Util.class(M.AnimInstance)
+M.Instance = Util.class(M.Instance)
 
-function M.AnimInstance:__init(ad, sindex, mode)
+function M.Instance:__init(ad, sindex, mode)
 	Util.tcheck(ad, "table")
 	Util.tcheck(sindex, "number", true)
 	Util.tcheck(mode, "number", true)
@@ -40,7 +40,7 @@ function M.AnimInstance:__init(ad, sindex, mode)
 	self:reset(sindex, mode)
 end
 
-function M.AnimInstance:reset(sindex, mode)
+function M.Instance:reset(sindex, mode)
 	self.mode = mode
 	self.playing = true
 	self.set = self.data.set[sindex]
@@ -59,13 +59,13 @@ function rewind(frame)
 	self.playing = true
 end
 
-function M.AnimInstance:is_playing()
+function M.Instance:is_playing()
 	return self.playing
 end
 
 -- Will return false if either the animation is
 -- not playing or if the animation has looped
-function M.AnimInstance:update(dt)
+function M.Instance:update(dt)
 	if self.playing then
 		self.accum = self.accum + dt
 		if self.data.duration <= self.accum then
@@ -91,18 +91,18 @@ function M.AnimInstance:update(dt)
 	end
 end
 
-function M.AnimInstance:render(x,y, r, sx,sy, ox,oy)
+function M.Instance:render(x,y, r, sx,sy, ox,oy)
 	Gfx.draw(
 		self.data.tex, self.set[self.frame],
 		x,y, r, sx,sy, ox,oy
 	)
 end
 
--- class AnimBatcher
+-- class Batcher
 
-M.AnimBatcher = Util.class(M.AnimBatcher)
+M.Batcher = Util.class(M.Batcher)
 
-function M.AnimBatcher:__init(ad, limit, mode)
+function M.Batcher:__init(ad, limit, mode)
 	Util.tcheck(ad, "table")
 	Util.tcheck(limit, "number")
 	Util.tcheck(mode, "number", true)
@@ -120,21 +120,21 @@ function M.AnimBatcher:__init(ad, limit, mode)
 	self.active = {}
 end
 
-function M.AnimBatcher:clear()
+function M.Batcher:clear()
 	self.batch:clear()
 	self.active = {}
 end
 
-function M.AnimBatcher:batch_begin()
+function M.Batcher:batch_begin()
 	self.batch:bind()
 end
 
-function M.AnimBatcher:batch_end()
+function M.Batcher:batch_end()
 	self.batch:unbind()
 end
 
 -- NOTE: add order determines render order
-function M.AnimBatcher:add(inst, x,y, r, sx,sy, ox,oy)
+function M.Batcher:add(inst, x,y, r, sx,sy, ox,oy)
 	local batch_id = self.active[inst]
 	if nil ~= batch_id then
 		self.batch:set(
@@ -144,7 +144,7 @@ function M.AnimBatcher:add(inst, x,y, r, sx,sy, ox,oy)
 		)
 	else
 		if self.limit <= #self.active then
-			Util.debug("AnimBatcher: batch full")
+			Util.debug("Batcher: batch full")
 		else
 			local batch_id = self.batch:add(
 				inst.set[inst.frame],
@@ -155,8 +155,8 @@ function M.AnimBatcher:add(inst, x,y, r, sx,sy, ox,oy)
 	end
 end
 
-function M.AnimBatcher:render()
-	Gfx.draw(self.batch, 0,0)
+function M.Batcher:render()
+	Gfx.draw(self.batch, 0, 0)
 end
 
 -- Animator interface
