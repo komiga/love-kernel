@@ -6,12 +6,12 @@ require("src/State")
 
 --local M_lrandom = require("random")
 
---[[local data = {
+--[[M.data = M.data or {
 	rng = nil
 }--]]
 
 function M.init()
-	--data.rng = M_lrandom.new(os.time())
+	--M.data.rng = M_lrandom.new(os.time())
 	math.randomseed(os.time())
 end
 
@@ -63,7 +63,7 @@ function M.debug(msg, ...)
 end
 
 function M.random(x, y)
-	--return data.rng:value(x, y)
+	--return M.data.rng:value(x, y)
 	return math.random(x, y)
 end
 
