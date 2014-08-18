@@ -1,7 +1,8 @@
 
 function love.conf(t)
 	t.version = "0.9.1"
-	t.identity = t.title .. "-save"
+	t.name = "love-kernel"
+	t.identity = t.name .. "-save"
 	t.console = false
 
 	t.modules.audio = true
