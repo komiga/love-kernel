@@ -53,14 +53,13 @@ end
 
 function M.debug_sub(sub, msg, ...)
 	if true == sub then
-		print("debug: "..msg, ...)
+		local info = debug.getinfo(3, "Sl")
+		print(info.short_src .. " @ " .. info.currentline .. ": debug: " .. msg, ...)
 	end
 end
 
 function M.debug(msg, ...)
-	if true == State.gen_debug then
-		print("debug: "..msg, ...)
-	end
+	M.debug_sub(State.gen_debug, msg, ...)
 end
 
 function M.random(x, y)
