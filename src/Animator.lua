@@ -6,7 +6,8 @@ require("src/Util")
 
 M.Mode = {
 	Stop = 1,
-	Loop = 2
+	Loop = 2,
+	Bounce = 3
 }
 
 M.BatchMode = {
@@ -46,6 +47,7 @@ function M.Instance:reset(sindex, mode)
 	self.set = self.data.set[sindex]
 	self.accum = 0.0
 	self.frame = 1
+	self.reverse = false
 end
 
 function rewind(frame)
@@ -70,9 +72,14 @@ function M.Instance:update(dt)
 		self.accum = self.accum + dt
 		if self.data.duration <= self.accum then
 			local amt = math.floor(self.accum / self.data.duration)
-			local new_frame = self.frame + amt
-			if new_frame > #self.set then
-				if M.Mode.Loop == self.mode then
+			local new_frame = self.frame + (self.reverse and -amt or amt)
+			if 0 >= new_frame or new_frame > #self.set then
+				if M.Mode.Bounce == self.mode then
+					self.accum = 0.0
+					self.frame = self.reverse and 1 or #self.set
+					self.reverse = not self.reverse
+					return false
+				elseif M.Mode.Loop == self.mode then
 					self.accum = 0.0
 					self.frame = 1
 					return false
