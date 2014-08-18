@@ -1,10 +1,12 @@
 
-module("State", package.seeall)
+State = State or {}
 
-gen_debug = true
-gfx_debug = true
-gfx_debug_cross = false
-sfx_debug = false
+State.gen_debug = true
+State.gfx_debug = true
+State.gfx_debug_cross = true
+State.sfx_debug = false
 
-paused = false
-pause_lock = false
+State.paused = false
+State.pause_lock = false
+
+State.auto_reload = true

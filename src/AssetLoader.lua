@@ -1,5 +1,6 @@
 
-module("AssetLoader", package.seeall)
+AssetLoader = AssetLoader or {}
+local M = AssetLoader
 
 require("src/Util")
 require("src/AudioManager")
@@ -336,7 +337,7 @@ local function load_kind(id, root_path, kind_name, desc_table, asset_table)
 	return id
 end
 
-function load(root_path, desc_root, asset_table)
+function M.load(root_path, desc_root, asset_table)
 	Util.tcheck(root_path, "string")
 	Util.tcheck(desc_root, "table")
 	Util.tcheck(asset_table, "table")

@@ -1,5 +1,6 @@
 
-module("Asset", package.seeall)
+Asset = Asset or {}
+local M = Asset
 
 require("src/AudioManager")
 require("src/FieldAnimator")
@@ -9,7 +10,7 @@ local InstancePolicy = AudioManager.InstancePolicy
 
 -- assets
 
-desc_root = {
+M.desc_root = {
 
 font = {
 	main = {18, default = true}
@@ -54,14 +55,14 @@ sound = {
 
 -- intro sequences
 
-intro_seq = {
+M.intro_seq = {
 	{name = "komiga"    , fade = 0.5, stay = 0.5},
 	{name = "disclaimer", fade = 0.5, stay = 2.0}
 }
 
 -- hooklets
 
-hooklets = {
+M.hooklets = {
 	KUMQUAT = {
 		text = "that's a kumquat!",
 		color = {255,255,255},

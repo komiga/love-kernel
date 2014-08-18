@@ -1,9 +1,10 @@
 
-module("FieldAnimator", package.seeall)
+FieldAnimator = FieldAnimator or {}
+local M = FieldAnimator
 
 require("src/Util")
 
-Mode = {
+FieldAnimator.Mode = {
 	Stop = 1,
 	Wrap = 2,
 	Continue = 3
@@ -11,10 +12,9 @@ Mode = {
 
 -- class FieldAnimator
 
-local Unit = {}
-Unit.__index = Unit
+M.Unit = Util.class(M.Unit)
 
-function Unit:__init(duration, fields, trans, mode, serial_reset_callback)
+function M.Unit:__init(duration, fields, trans, mode, serial_reset_callback)
 	Util.tcheck(duration, "number")
 	Util.tcheck(fields, "table")
 	Util.tcheck(trans, "table")
@@ -24,16 +24,16 @@ function Unit:__init(duration, fields, trans, mode, serial_reset_callback)
 	self.duration = duration
 	self.fields = fields
 	self.trans = trans
-	self.mode = Util.optional(mode, Mode.Stop)
+	self.mode = Util.optional(mode, FieldAnimator.Mode.Stop)
 	self.serial_reset_callback = serial_reset_callback
 	self:reset()
 end
 
-function Unit:is_complete()
+function M.Unit:is_complete()
 	return 1.0 <= self.total
 end
 
-function Unit:reset(new_duration)
+function M.Unit:reset(new_duration)
 	Util.tcheck(new_duration, "number", true)
 	self.duration = Util.optional(new_duration, self.duration)
 	self.time = 0.0
@@ -57,7 +57,7 @@ function Unit:reset(new_duration)
 	end
 end
 
-function Unit:get_field_trans(f)
+function M.Unit:get_field_trans(f)
 	local index = self.picked[f]
 	if nil ~= index then
 		return self.trans[f][index]
@@ -66,7 +66,7 @@ function Unit:get_field_trans(f)
 	end
 end
 
-function Unit:__post(f, value)
+function M.Unit:__post(f, value)
 	if "function" == type(self.fields[f]) then
 		self.fields[f](value, self)
 	else
@@ -74,28 +74,28 @@ function Unit:__post(f, value)
 	end
 end
 
-function Unit:__update_field_table(f, t)
+function M.Unit:__update_field_table(f, t)
 	local value = t[1] + ((t[2] - t[1]) * self.total)
 	for _, af in pairs(f) do
 		self:__post(af, value)
 	end
 end
 
-function Unit:__update_field(f, t)
+function M.Unit:__update_field(f, t)
 	local value = t[1] + ((t[2] - t[1]) * self.total)
 	self:__post(f, value)
 end
 
-function Unit:update(dt)
+function M.Unit:update(dt)
 	self.time = self.time + dt
-	if Mode.Continue ~= self.mode and self.time >= self.duration then
-		if Mode.Stop == self.mode then
+	if FieldAnimator.Mode.Continue ~= self.mode and self.time >= self.duration then
+		if FieldAnimator.Mode.Stop == self.mode then
 			self.time = self.duration
 			self.total = 1.0
 			if self.serial_reset_callback then
 				self.serial_reset_callback(self)
 			end
-		elseif Mode.Wrap == self.mode then
+		elseif FieldAnimator.Mode.Wrap == self.mode then
 			self:reset()
 			if self.serial_reset_callback then
 				self.serial_reset_callback(self)
@@ -116,9 +116,6 @@ end
 
 -- FieldAnimator interface
 
-function new(duration, fields, trans, mode, serial_reset_callback)
-	return Util.new_object(
-		Unit,
-		duration, fields, trans, mode, serial_reset_callback
-	)
+function M.new(duration, fields, trans, mode, serial_reset_callback)
+	return Util.new_object(M.Unit, duration, fields, trans, mode, serial_reset_callback)
 end

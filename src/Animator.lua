@@ -1,14 +1,15 @@
 
-module("Animator", package.seeall)
+Animator = Animator or {}
+local M = Animator
 
 require("src/Util")
 
-Mode = {
+M.Mode = {
 	Stop = 1,
 	Loop = 2
 }
 
-BatchMode = {
+M.BatchMode = {
 	Dynamic = 1,
 	Static = 2,
 	Stream = 3
@@ -22,10 +23,9 @@ local BatchModeName = {
 
 -- class AnimInstance
 
-local AnimInstance = {}
-AnimInstance.__index = AnimInstance
+M.AnimInstance = Util.class(M.AnimInstance)
 
-function AnimInstance:__init(ad, sindex, mode)
+function M.AnimInstance:__init(ad, sindex, mode)
 	Util.tcheck(ad, "table")
 	Util.tcheck(sindex, "number", true)
 	Util.tcheck(mode, "number", true)
@@ -33,14 +33,14 @@ function AnimInstance:__init(ad, sindex, mode)
 	assert(1 <= sindex and #ad.set >= sindex)
 
 	sindex = Util.optional(sindex, 1)
-	mode = Util.optional(mode, Mode.Stop)
+	mode = Util.optional(mode, M.Mode.Stop)
 
 	self.batch_id = nil
 	self.data = ad
 	self:reset(sindex, mode)
 end
 
-function AnimInstance:reset(sindex, mode)
+function M.AnimInstance:reset(sindex, mode)
 	self.mode = mode
 	self.playing = true
 	self.set = self.data.set[sindex]
@@ -59,20 +59,20 @@ function rewind(frame)
 	self.playing = true
 end
 
-function AnimInstance:is_playing()
+function M.AnimInstance:is_playing()
 	return self.playing
 end
 
 -- Will return false if either the animation is
 -- not playing or if the animation has looped
-function AnimInstance:update(dt)
+function M.AnimInstance:update(dt)
 	if self.playing then
 		self.accum = self.accum + dt
 		if self.data.duration <= self.accum then
 			local amt = math.floor(self.accum / self.data.duration)
 			local new_frame = self.frame + amt
 			if new_frame > #self.set then
-				if Mode.Loop == self.mode then
+				if M.Mode.Loop == self.mode then
 					self.accum = 0.0
 					self.frame = 1
 					return false
@@ -91,7 +91,7 @@ function AnimInstance:update(dt)
 	end
 end
 
-function AnimInstance:render(x,y, r, sx,sy, ox,oy)
+function M.AnimInstance:render(x,y, r, sx,sy, ox,oy)
 	Gfx.draw(
 		self.data.tex, self.set[self.frame],
 		x,y, r, sx,sy, ox,oy
@@ -100,15 +100,14 @@ end
 
 -- class AnimBatcher
 
-local AnimBatcher = {}
-AnimBatcher.__index = AnimBatcher
+M.AnimBatcher = Util.class(M.AnimBatcher)
 
-function AnimBatcher:__init(ad, limit, mode)
+function M.AnimBatcher:__init(ad, limit, mode)
 	Util.tcheck(ad, "table")
 	Util.tcheck(limit, "number")
 	Util.tcheck(mode, "number", true)
 
-	mode = Util.optional(mode, BatchMode.Dynamic)
+	mode = Util.optional(mode, Animator.BatchMode.Dynamic)
 
 	self.data = ad
 	self.limit = limit
@@ -121,21 +120,21 @@ function AnimBatcher:__init(ad, limit, mode)
 	self.active = {}
 end
 
-function AnimBatcher:clear()
+function M.AnimBatcher:clear()
 	self.batch:clear()
 	self.active = {}
 end
 
-function AnimBatcher:batch_begin()
+function M.AnimBatcher:batch_begin()
 	self.batch:bind()
 end
 
-function AnimBatcher:batch_end()
+function M.AnimBatcher:batch_end()
 	self.batch:unbind()
 end
 
 -- NOTE: add order determines render order
-function AnimBatcher:add(inst, x,y, r, sx,sy, ox,oy)
+function M.AnimBatcher:add(inst, x,y, r, sx,sy, ox,oy)
 	local batch_id = self.active[inst]
 	if nil ~= batch_id then
 		self.batch:set(
@@ -156,7 +155,7 @@ function AnimBatcher:add(inst, x,y, r, sx,sy, ox,oy)
 	end
 end
 
-function AnimBatcher:render()
+function M.AnimBatcher:render()
 	Gfx.draw(self.batch, 0,0)
 end
 
@@ -166,17 +165,17 @@ local data = {
 	__initialized = false
 }
 
-function init(anim_table)
+function M.init(anim_table)
 	Util.tcheck(anim_table, "table")
 	assert(not data.__initialized)
 
 	data.__initialized = true
 end
 
-function batcher(ad, limit, mode)
-	return Util.new_object(AnimBatcher, ad, limit, mode)
+function M.batcher(ad, limit, mode)
+	return Util.new_object(M.AnimBatcher, ad, limit, mode)
 end
 
-function instance(ad, sindex, mode)
-	return Util.new_object(AnimInstance, ad, sindex, mode)
+function M.instance(ad, sindex, mode)
+	return Util.new_object(M.AnimInstance, ad, sindex, mode)
 end

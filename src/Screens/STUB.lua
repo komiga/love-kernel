@@ -1,5 +1,6 @@
 
-module("STUBScreen", package.seeall)
+STUBScreen = STUBScreen or {}
+local M = STUBScreen
 
 require("src/State")
 require("src/Util")
@@ -8,7 +9,6 @@ require("src/Screen")
 require("src/Camera")
 require("src/AudioManager")
 require("src/FieldAnimator")
-require("src/Hooker")
 require("src/Animator")
 require("src/AssetLoader")
 require("src/Asset")
@@ -39,41 +39,40 @@ data.bind_table = {
 
 -- class Impl
 
-local Impl = {}
-Impl.__index = Impl
+M.Impl = Util.class(M.Impl)
 
-function Impl:__init()
+function M.Impl:__init()
 	-- TODO: INITIALIZE
 end
 
-function Impl:notify_pushed()
+function M.Impl:notify_pushed()
 	-- TODO: PUSH-INIT
 end
 
-function Impl:notify_became_top()
+function M.Impl:notify_became_top()
 end
 
-function Impl:notify_popped()
+function M.Impl:notify_popped()
 	-- TODO: POP-DEINIT
 end
 
-function Impl:focus_changed(focused)
+function M.Impl:focus_changed(focused)
 	if not State.pause_lock then
 		Core.pause(not focused)
 	end
 end
 
-function Impl:bind_gate(bind, ident, dt, kind)
+function M.Impl:bind_gate(bind, ident, dt, kind)
 	return not State.paused
 end
 
-function Impl:update(dt)
+function M.Impl:update(dt)
 	if not State.paused then
 		-- TODO: UPDATE THE THINGS
 	end
 end
 
-function Impl:render()
+function M.Impl:render()
 	Camera.lock()
 
 	-- TODO: RENDER ALL THE THINGS
@@ -90,26 +89,26 @@ local function __static_init()
 end
 
 -- Make local if singleton
---[[local--]] function new(transparent)
+--[[local--]] function M.new(transparent)
 	__static_init()
 
-	local impl = Util.new_object(Impl)
+	local impl = Util.new_object(M.Impl)
 	return Screen.new(impl, data.bind_group, transparent)
 end
 
 -- Singleton
 --[[
 
-function init(_)
+function M.init(_)
 	assert(not data.__initialized)
-	data.instance = new(false)
+	data.instance = M.new(false)
 	data.impl = data.instance.impl
 	data.__initialized = true
 
 	return data.instance
 end
 
-function get_instance()
+function M.get_instance()
 	return data.instance
 end
 

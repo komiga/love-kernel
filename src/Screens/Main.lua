@@ -1,5 +1,7 @@
 
-module("MainScreen", package.seeall)
+--module("MainScreen", package.seeall)
+MainScreen = MainScreen or {}
+local M = MainScreen
 
 require("src/State")
 require("src/Util")
@@ -81,10 +83,9 @@ data.bind_table = {
 
 -- class Impl
 
-local Impl = {}
-Impl.__index = Impl
+M.Impl = Util.class(M.Impl)
 
-function Impl:__init()
+function M.Impl:__init()
 	local anim_data = Asset.anim.moving_square
 	self.batcher = Animator.batcher(
 		anim_data, 4, Animator.BatchMode.Dynamic
@@ -101,7 +102,7 @@ function Impl:__init()
 	self.pending_pause = false
 end
 
-function Impl:push_intro()
+function M.Impl:push_intro()
 	Screen.push(IntroScreen.new(
 		Asset.intro_seq,
 		Asset.atlas.intro_seq,
@@ -110,7 +111,7 @@ function Impl:push_intro()
 	))
 end
 
-function Impl:pause(on)
+function M.Impl:pause(on)
 	if not State.pause_lock then
 		if self.screen_unit:is_top() then
 			Core.pause(on)
@@ -120,29 +121,29 @@ function Impl:pause(on)
 	end
 end
 
-function Impl:notify_pushed()
+function M.Impl:notify_pushed()
 	self:push_intro()
 end
 
-function Impl:notify_became_top()
+function M.Impl:notify_became_top()
 	if self.pending_pause then
 		self.pending_pause = false
 		Core.pause(true)
 	end
 end
 
-function Impl:notify_popped()
+function M.Impl:notify_popped()
 	Hooker.clear_specific(Asset.hooklets.KUMQUAT)
 end
 
-function Impl:bind_gate(bind, ident, dt, kind)
+function M.Impl:bind_gate(bind, ident, dt, kind)
 	--if "escape" == ident then
 	--	return true
 	--end
 	return not State.paused
 end
 
-function Impl:update(dt)
+function M.Impl:update(dt)
 	if State.paused then
 		return
 	end
@@ -161,7 +162,7 @@ function Impl:update(dt)
 	end
 end
 
-function Impl:render()
+function M.Impl:render()
 	Camera.lock()
 
 	local b, a, t
@@ -216,11 +217,11 @@ end
 local function new(transparent)
 	__static_init()
 
-	local impl = Util.new_object(Impl)
+	local impl = Util.new_object(M.Impl)
 	return Screen.new(impl, data.bind_group, transparent)
 end
 
-function init(_)
+function M.init(_)
 	assert(not data.__initialized)
 	data.instance = new(false)
 	data.impl = data.instance.impl
@@ -230,11 +231,11 @@ function init(_)
 	return data.instance
 end
 
-function get_instance()
+function M.get_instance()
 	return data.instance
 end
 
-function focus_changed(focused)
+function M.focus_changed(focused)
 	if not State.pause_lock then
 		data.impl:pause(not focused)
 	end

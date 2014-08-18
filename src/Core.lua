@@ -1,5 +1,6 @@
 
-module("Core", package.seeall)
+Core = Core or {}
+local M = Core
 
 require("src/State")
 require("src/Util")
@@ -13,17 +14,12 @@ require("src/AssetLoader")
 require("src/Screens/Main")
 require("src/Screens/Intro")
 
-local data = {
+M.data = M.data or {
 	bind_table = nil,
 	focus_fn = nil
 }
 
-Core.display_width = nil
-Core.display_width_half = nil
-Core.display_height = nil
-Core.display_height_half = nil
-
-data.bind_table = {
+M.data.bind_table = {
 -- System
 	["pause"] = {
 		on_release = true,
@@ -37,14 +33,14 @@ data.bind_table = {
 	}
 }
 
-function bind_gate(bind, ident, dt, kind)
+function M.bind_gate(bind, ident, dt, kind)
 	if State.paused then
 		return false
 	end
 	return Screen.bind_gate(bind, ident, dt, kind)
 end
 
-function init(args)
+function M.init(args)
 	-- Ensure debug is enabled for initialization
 	local debug_mode_temp = false
 	if not State.gen_debug then
@@ -58,7 +54,7 @@ function init(args)
 	Core.display_height_half = 0.5 * Core.display_height
 
 	if not debug_mode_temp then
-		data.bind_table["f1"] = {
+		M.data.bind_table["f1"] = {
 			on_release = true,
 			system = true,
 			handler = function(_, _, _, _)
@@ -70,7 +66,7 @@ function init(args)
 				end
 			end
 		}
-		data.bind_table["f2"] = {
+		M.data.bind_table["f2"] = {
 			on_release = true,
 			system = true,
 			handler = function(_, _, _, _)
@@ -82,7 +78,7 @@ function init(args)
 				end
 			end
 		}
-		data.bind_table["f3"] = {
+		M.data.bind_table["f3"] = {
 			on_release = true,
 			system = true,
 			handler = function(_, _, _, _)
@@ -94,7 +90,7 @@ function init(args)
 				end
 			end
 		}
-		data.bind_table["f6"] = {
+		M.data.bind_table["f6"] = {
 			on_release = true,
 			system = true,
 			handler = function(_, _, _, _)
@@ -110,7 +106,7 @@ function init(args)
 
 	-- system initialization
 	Util.init()
-	Bind.init(data.bind_table, bind_gate, true)
+	Bind.init(M.data.bind_table, Core.bind_gate, true)
 
 	-- assets
 	AssetLoader.load("asset/", Asset.desc_root, Asset)
@@ -134,16 +130,16 @@ function init(args)
 	end
 end
 
-function deinit()
+function M.deinit()
 	Screen.clear()
 end
 
-function exit()
+function M.exit()
 	Core.deinit()
 	return true
 end
 
-function pause(paused)
+function M.pause(paused)
 	if not State.pause_lock then
 		State.paused = paused
 		if State.paused then
@@ -154,17 +150,17 @@ function pause(paused)
 	end
 end
 
-function set_focus_fn(fn)
-	data.focus_fn = fn
+function M.set_focus_fn(fn)
+	M.data.focus_fn = fn
 end
 
-function focus_changed(focused)
-	if nil ~= data.focus_fn then
-		data.focus_fn(focused)
+function M.focus_changed(focused)
+	if nil ~= M.data.focus_fn then
+		M.data.focus_fn(focused)
 	end
 end
 
-function update(dt)
+function M.update(dt)
 	if true == State.paused then
 		Bind.update(0.0)
 	else
@@ -174,7 +170,7 @@ function update(dt)
 	Screen.update(dt)
 end
 
-function render()
+function M.render()
 	Gfx.setColor(255,255,255, 255)
 	Screen.render()
 

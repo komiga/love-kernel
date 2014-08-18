@@ -1,28 +1,28 @@
 
-module("Camera", package.seeall)
+Camera = Camera or {}
+local M = Camera
 
 require("src/Util")
 require("src/AudioManager")
 
-local data = {
+M.data = M.data or {
 	__love_translate = Gfx.translate,
 	__initialized = false,
 	cam = nil
 }
 
-data.__camera_translate = function(x, y)
-	data.__love_translate(
-		Core.display_width_half - data.cam.x + x,
-		Core.display_height_half - data.cam.y + y
+M.data.__camera_translate = function(x, y)
+	M.data.__love_translate(
+		Core.display_width_half - M.data.cam.x + x,
+		Core.display_height_half - M.data.cam.y + y
 	)
 end
 
 -- class Camera
 
-local Unit = {}
-Unit.__index = Unit
+M.Unit = Util.class(M.Unit)
 
-function Unit:__init(x, y, x_speed, y_speed)
+function M.Unit:__init(x, y, x_speed, y_speed)
 	Util.tcheck(x, "number")
 	Util.tcheck(y, "number")
 	Util.tcheck(x_speed, "number", true)
@@ -40,14 +40,14 @@ function Unit:__init(x, y, x_speed, y_speed)
 	self.locked = false
 end
 
-function Unit:set_position(x, y)
+function M.Unit:set_position(x, y)
 	self.x = x
 	self.y = y
 	self.x_target = x
 	self.y_target = y
 end
 
-function Unit:target(x, y)
+function M.Unit:target(x, y)
 	if 0 == self.x_speed then
 		self.x = x
 	else
@@ -60,11 +60,11 @@ function Unit:target(x, y)
 	end
 end
 
-function Unit:move(x, y)
+function M.Unit:move(x, y)
 	self:target(self.x + x, self.y + y)
 end
 
-function Unit:update(dt)
+function M.Unit:update(dt)
 	local delta
 	if self.x ~= self.x_target then
 		delta = self.x_speed * dt
@@ -84,17 +84,17 @@ function Unit:update(dt)
 	end
 end
 
-function Unit:lock()
+function M.Unit:lock()
 	assert(not self.locked)
 	Gfx.push()
-	Gfx.translate = data.__camera_translate
+	Gfx.translate = M.data.__camera_translate
 	Gfx.translate(0, 0)
 	self.locked = true
 end
 
-function Unit:unlock()
+function M.Unit:unlock()
 	assert(self.locked)
-	Gfx.translate = data.__love_translate
+	Gfx.translate = M.data.__love_translate
 	Gfx.pop()
 	self.locked = false
 end
@@ -103,72 +103,72 @@ end
 
 -- If x_speed or y_speed are 0, :move() and :target()
 -- are the same as :set_position()
-function new(x, y, x_speed, y_speed)
-	return Util.new_object(Unit, x, y, x_speed, y_speed)
+function M.new(x, y, x_speed, y_speed)
+	return Util.new_object(M.Unit, x, y, x_speed, y_speed)
 end
 
-function init(x, y, x_speed, y_speed)
-	assert(not data.__initialized)
+function M.init(x, y, x_speed, y_speed)
+	assert(not M.data.__initialized)
 
-	data.cam = Camera.new(x, y, x_speed, y_speed)
+	M.data.cam = Camera.new(x, y, x_speed, y_speed)
 
-	data.__initialized = true
-	return data.cam
+	M.data.__initialized = true
+	return M.data.cam
 end
 
-function srel_x(x)
-	return data.cam.x - Core.display_width_half + x
+function M.srel_x(x)
+	return M.data.cam.x - Core.display_width_half + x
 end
 
-function srel_y(y)
-	return data.cam.y - Core.display_height_half + y
+function M.srel_y(y)
+	return M.data.cam.y - Core.display_height_half + y
 end
 
-function rel_x(x)
-	return x + data.cam.x
+function M.rel_x(x)
+	return x + M.data.cam.x
 end
 
-function rel_y(y)
-	return y + data.cam.y
+function M.rel_y(y)
+	return y + M.data.cam.y
 end
 
-function srel(x, y)
+function M.srel(x, y)
 	return rel_x(x), rel_y(y)
 end
 
-function rel(x, y)
+function M.rel(x, y)
 	return rel_x(x), rel_y(y)
 end
 
-function get()
-	return data.cam
+function M.get()
+	return M.data.cam
 end
 
-function set(cam)
-	data.cam = cam
+function M.set(cam)
+	M.data.cam = cam
 end
 
-function set_position(x, y)
-	data.cam:set_position(x, y)
+function M.set_position(x, y)
+	M.data.cam:set_position(x, y)
 end
 
-function target(x, y)
-	data.cam:target(x, y)
+function M.target(x, y)
+	M.data.cam:target(x, y)
 end
 
-function move(x, y)
-	data.cam:move(x, y)
+function M.move(x, y)
+	M.data.cam:move(x, y)
 end
 
-function update(dt)
-	AudioManager.set_position(data.cam.x, data.cam.y)
-	data.cam:update(dt)
+function M.update(dt)
+	AudioManager.set_position(M.data.cam.x, M.data.cam.y)
+	M.data.cam:update(dt)
 end
 
-function lock()
-	data.cam:lock()
+function M.lock()
+	M.data.cam:lock()
 end
 
-function unlock()
-	data.cam:unlock()
+function M.unlock()
+	M.data.cam:unlock()
 end

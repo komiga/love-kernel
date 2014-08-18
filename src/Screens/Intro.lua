@@ -1,5 +1,6 @@
 
-module("IntroScreen", package.seeall)
+IntroScreen = IntroScreen or {}
+local M = IntroScreen
 
 require("src/State")
 require("src/Util")
@@ -32,18 +33,15 @@ local Mode = {
 	Out = 3
 }
 
-local Impl = {}
-Impl.__index = Impl
+M.Impl = Util.class(M.Impl)
 
 local function make_seq(seq_data)
 	assert(nil ~= seq_data)
-
 	local seq = {}
-	
 	return seq
 end
 
-function Impl:__init(seq, atlas, soft)
+function M.Impl:__init(seq, atlas, soft)
 	Util.tcheck(seq, "table")
 	Util.tcheck(atlas, "table")
 	Util.tcheck(soft, "boolean", false)
@@ -77,11 +75,11 @@ function Impl:__init(seq, atlas, soft)
 	self:reset()
 end
 
-function Impl:current_seq()
+function M.Impl:current_seq()
 	return self.sequences[self.seq_idx]
 end
 
-function Impl:fmode()
+function M.Impl:fmode()
 	if self.mode == Mode.Stay then
 		return nil
 	end
@@ -92,7 +90,7 @@ function Impl:fmode()
 	)
 end
 
-function Impl:animator()
+function M.Impl:animator()
 	if self.mode == Mode.Stay then
 		return nil
 	end
@@ -103,28 +101,28 @@ function Impl:animator()
 	)
 end
 
-function Impl:is_soft()
+function M.Impl:is_soft()
 	return self.soft
 end
 
-function Impl:is_last()
+function M.Impl:is_last()
 	return self.seq_idx == #self.sequences
 end
 
-function Impl:is_seq_finished()
+function M.Impl:is_seq_finished()
 	return self.seq_idx > #self.sequences
 end
 
-function Impl:is_finishing()
+function M.Impl:is_finishing()
 	return self.mode == Mode.Out and self.seq_idx >= #self.sequences
 end
 
-function Impl:terminate()
+function M.Impl:terminate()
 	Util.debug("Intro:terminate()")
 	Screen.pop(self.screen_unit)
 end
 
-function Impl:reset()
+function M.Impl:reset()
 	self.mode = Mode.In
 	self.seq_idx = 1
 	self.fmode_in.animator:reset(self:current_seq().fade)
@@ -132,19 +130,19 @@ function Impl:reset()
 	self.fmode_out_bg.animator:reset()
 end
 
-function Impl:notify_pushed()
+function M.Impl:notify_pushed()
 	Util.debug("Intro:notify_pushed")
 	self:reset()
 end
 
-function Impl:notify_became_top()
+function M.Impl:notify_became_top()
 end
 
-function Impl:notify_popped()
+function M.Impl:notify_popped()
 	Util.debug("Intro:notify_popped")
 end
 
-function Impl:bind_gate(bind, ident, dt, kind)
+function M.Impl:bind_gate(bind, ident, dt, kind)
 	if kind == Bind.Kind.Release then
 		self:terminate()
 		return false
@@ -153,7 +151,7 @@ function Impl:bind_gate(bind, ident, dt, kind)
 	end
 end
 
-function Impl:update(dt)
+function M.Impl:update(dt)
 	if State.paused then
 		return
 	end
@@ -192,7 +190,7 @@ function Impl:update(dt)
 	end
 end
 
-function Impl:render()
+function M.Impl:render()
 	Gfx.setColor(
 		0,0,0,
 		Util.ternary(
@@ -226,9 +224,9 @@ end
 local function __static_init()
 end
 
-function new(seq, atlas, soft, transparent)
+function M.new(seq, atlas, soft, transparent)
 	__static_init()
 
-	local impl = Util.new_object(Impl, seq, atlas, soft)
+	local impl = Util.new_object(M.Impl, seq, atlas, soft)
 	return Screen.new(impl, nil, transparent)
 end

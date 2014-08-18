@@ -10,13 +10,21 @@ HID = {
 	Keyboard = love.keyboard
 }
 
+require("src/State")
 require("src/Core")
 
 function love.load(argv)
+	if State.auto_reload then
+		lurker = require("dep/lurker/lurker")
+		lurker.interval = 1.0
+	end
 	Core.init(argv)
 end
 
 function love.update(dt)
+	if State.auto_reload then
+		lurker.update()
+	end
 	Core.update(dt)
 end
 

@@ -1,42 +1,42 @@
 
-module("Timer", package.seeall)
+Timer = Timer or {}
+local M = Timer
 
 require("src/Util")
 
 -- class Timer
 
-local Unit = {}
-Unit.__index = Unit
+M.Unit = Util.class(M.Unit)
 
-function Unit:__init(duration)
+function M.Unit:__init(duration)
 	self.duration = 0.0
 	self:reset(duration)
 end
 
-function Unit:reset(new_duration)
+function M.Unit:reset(new_duration)
 	Util.tcheck(new_duration, "number", true)
 	self.duration = Util.optional(new_duration, duration)
 	self.elapsed = 0.0
 	self.ticks = 0
 end
 
-function Unit:has_duration()
+function M.Unit:has_duration()
 	return 0.0 ~= self.duration
 end
 
-function Unit:duration()
+function M.Unit:duration()
 	return self.duration
 end
 
-function Unit:elapsed()
+function M.Unit:elapsed()
 	return self.elapsed
 end
 
-function Unit:ticks()
+function M.Unit:ticks()
 	return self.ticks
 end
 
-function Unit:update(dt)
+function M.Unit:update(dt)
 	self.elapsed = self.elapsed + dt
 	if self:has_duration() then
 		if self.elapsed > self.duration then
@@ -50,6 +50,6 @@ end
 
 -- Timer interface
 
-function new(duration)
-	return Util.new_object(Unit, duration)
+function M.new(duration)
+	return Util.new_object(M.Unit, duration)
 end

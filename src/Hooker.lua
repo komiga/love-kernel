@@ -1,15 +1,15 @@
 
-module("Hooker", package.seeall)
+Hooker = Hooker or {}
+local M = Hooker
 
 require("src/Util")
 require("src/FieldAnimator")
 
 -- class Hooklet
 
-local Hooklet = {}
-Hooklet.__index = Hooklet
+M.Hooklet = Util.class(M.Hooklet)
 
-function Hooklet:__init(props, x, y)
+function M.Hooklet:__init(props, x, y)
 	Util.tcheck(props, "table")
 	Util.tcheck(x, "number")
 	Util.tcheck(y, "number")
@@ -26,7 +26,7 @@ function Hooklet:__init(props, x, y)
 	)
 end
 
-function Hooklet:update(dt)
+function M.Hooklet:update(dt)
 	if self.animator:is_complete() then
 		return false
 	else
@@ -35,7 +35,7 @@ function Hooklet:update(dt)
 	end
 end
 
-function Hooklet:render()
+function M.Hooklet:render()
 	Util.set_color_table(self.props.color, self.fields.alpha)
 	Gfx.setFont(self.props.font)
 	Gfx.print(
@@ -50,15 +50,15 @@ end
 
 -- Hooker interface
 
-local data = {
+M.data = M.data or {
 	__initialized = false,
 	active = nil
 }
 
-function init(hooklet_props, default_font)
+function M.init(hooklet_props, default_font)
 	Util.tcheck(hooklet_props, "table")
 	Util.tcheck_obj(default_font, "Font", true)
-	assert(not data.__initialized)
+	assert(not M.data.__initialized)
 
 	if nil == default_font then
 		default_font = Gfx.getFont()
@@ -76,53 +76,53 @@ function init(hooklet_props, default_font)
 		end
 	end
 
-	data.active = {}
-	data.__initialized = true
+	M.data.active = {}
+	M.data.__initialized = true
 end
 
-function num_active()
-	return #data.active
+function M.num_active()
+	return #M.data.active
 end
 
-function clear()
-	data.active = {}
+function M.clear()
+	M.data.active = {}
 end
 
-function clear_specific(props)
+function M.clear_specific(props)
 	local rmkeys = {}
-	for idx, hkl in ipairs(data.active) do
+	for idx, hkl in ipairs(M.data.active) do
 		if hkl.props == props then
 			table.insert(rmkeys, 1, idx)
 		end
 	end
 	if 0 < #rmkeys then
 		for _, idx in pairs(rmkeys) do
-			table.remove(data.active, idx)
+			table.remove(M.data.active, idx)
 		end
 	end
 end
 
-function spawn(props, x, y)
-	local hkl = Util.new_object(Hooklet, props, x, y)
-	table.insert(data.active, hkl)
+function M.spawn(props, x, y)
+	local hkl = Util.new_object(M.Hooklet, props, x, y)
+	table.insert(M.data.active, hkl)
 end
 
-function update(dt)
+function M.update(dt)
 	local rmkeys = {}
-	for idx, hooklet in pairs(data.active) do
+	for idx, hooklet in pairs(M.data.active) do
 		if not hooklet:update(dt) then
 			table.insert(rmkeys, 1, idx)
 		end
 	end
 	if 0 < #rmkeys then
 		for _, idx in pairs(rmkeys) do
-			table.remove(data.active, idx)
+			table.remove(M.data.active, idx)
 		end
 	end
 end
 
-function render()
-	for _, hooklet in pairs(data.active) do
+function M.render()
+	for _, hooklet in pairs(M.data.active) do
 		Gfx.push()
 		hooklet:render()
 		Gfx.pop()

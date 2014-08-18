@@ -1,7 +1,8 @@
 
-module("AudioManager", package.seeall)
+AudioManager = AudioManager or {}
+local M = AudioManager
 
-InstancePolicy = {
+M.InstancePolicy = {
 	-- Kill immediately, regardless of limit; grow past limit
 	Immediate = 1,
 	-- Never kill, never grow
@@ -14,52 +15,50 @@ InstancePolicy = {
 
 -- class SoundInstance
 
-local SoundInstance = {}
-SoundInstance.__index = SoundInstance
+M.SoundInstance = Util.class(M.SoundInstance)
 
-function SoundInstance.new(sound_data, x, y, z)
-	return Util.new_object(SoundInstance, sound_data, x, y, z)
+function M.SoundInstance.new(sound_data, x, y, z)
+	return Util.new_object(M.SoundInstance, sound_data, x, y, z)
 end
 
-function SoundInstance:__init(sound_data, x, y, z)
+function M.SoundInstance:__init(sound_data, x, y, z)
 	self.source = Sfx.newSource(sound_data.data, "static")
 	self:set_position(x, y, z)
 end
 
-function SoundInstance:set_position(x, y, z)
+function M.SoundInstance:set_position(x, y, z)
 	self.source:setPosition(x, y, z)
 end
 
-function SoundInstance:stop()
+function M.SoundInstance:stop()
 	self.source:stop()
 end
 
-function SoundInstance:play()
+function M.SoundInstance:play()
 	self.source:play()
 end
 
-function SoundInstance:restart()
+function M.SoundInstance:restart()
 	self.source:rewind()
 end
 
-function SoundInstance:is_playing()
+function M.SoundInstance:is_playing()
 	return not self.source:isStopped()
 end
 
-function SoundInstance:update(_)
+function M.SoundInstance:update(_)
 	return self:is_playing()
 end
 
 -- class Bucket
 
-local Bucket = {}
-Bucket.__index = Bucket
+M.Bucket = Util.class(M.Bucket)
 
-function Bucket.new(sound_data)
-	return Util.new_object(Bucket, sound_data)
+function M.Bucket.new(sound_data)
+	return Util.new_object(M.Bucket, sound_data)
 end
 
-function Bucket:__init(sound_data)
+function M.Bucket:__init(sound_data)
 	Util.tcheck(sound_data, "table")
 	Util.tcheck_obj(sound_data.data, "SoundData")
 
@@ -67,34 +66,34 @@ function Bucket:__init(sound_data)
 	self.active = {}
 	self.free = {}
 
-	if InstancePolicy.Immediate ~= self.data.policy then
+	if M.InstancePolicy.Immediate ~= self.data.policy then
 		for i = 1, self.data.limit do
 			table.insert(
 				self.free,
-				SoundInstance.new(sound_data, 0.0, 0.0, 0.0)
+				M.SoundInstance.new(sound_data, 0.0, 0.0, 0.0)
 			)
 		end
 		self.count = self.data.limit
 	end
 end
 
-function Bucket:can_grow()
+function M.Bucket:can_grow()
 	return
-		InstancePolicy.Constant ~= self.data.policy and
-		InstancePolicy.Trample ~= self.data.policy
+		M.InstancePolicy.Constant ~= self.data.policy and
+		M.InstancePolicy.Trample ~= self.data.policy
 end
 
-function Bucket:spawn(x, y, z)
+function M.Bucket:spawn(x, y, z)
 	local inst
 	if 0 < #self.free then
 		inst = Util.last(self.free)
 		table.remove(self.free)
 	else
 		if self:can_grow() then
-			inst = SoundInstance.new(self.data, x, y, z)
+			inst = M.SoundInstance.new(self.data, x, y, z)
 			self.count = self.count + 1
 		elseif
-			InstancePolicy.Trample == self.policy
+			M.InstancePolicy.Trample == self.policy
 			and 0 < #self.active
 		then
 			self.active[1]:rewind()
@@ -109,7 +108,7 @@ function Bucket:spawn(x, y, z)
 	end
 end
 
-function Bucket:update(dt)
+function M.Bucket:update(dt)
 	local policy = self.data.policy
 	if 0 < #self.active then
 		for i, inst in pairs(self.active) do
@@ -119,9 +118,9 @@ function Bucket:update(dt)
 				)
 				table.remove(self.active, i)
 				if
-					InstancePolicy.Constant == policy
-					or InstancePolicy.Trample == policy
-					or (InstancePolicy.Reserve == policy
+					M.InstancePolicy.Constant == policy
+					or M.InstancePolicy.Trample == policy
+					or (M.InstancePolicy.Reserve == policy
 						and self.count <= self.data.limit)
 				then
 					Util.debug_sub(State.sfx_debug, "  (kept)")
@@ -143,7 +142,7 @@ local data = {
 	buckets = nil
 }
 
-function init(sound_table)
+function M.init(sound_table)
 	Util.tcheck(sound_table, "table")
 	assert(not data.__initialized)
 
@@ -152,16 +151,16 @@ function init(sound_table)
 	data.__initialized = true
 
 	for _, sd in pairs(sound_table) do
-		data.buckets[sd.__id] = Bucket.new(sd)
+		data.buckets[sd.__id] = M.Bucket.new(sd)
 	end
 end
 
-function set_position(x, y, z)
+function M.set_position(x, y, z)
 	Sfx.setPosition(x, y, Util.optional(z, 0.0))
 	--Util.debug("AudioManager.set_position: ", x, y, z)
 end
 
-function spawn(sound_data, x, y, z)
+function M.spawn(sound_data, x, y, z)
 	local bkt = data.buckets[sound_data.__id]
 	assert(nil ~= bkt)
 
@@ -172,21 +171,21 @@ function spawn(sound_data, x, y, z)
 	)
 end
 
-function pause()
+function M.pause()
 	if not data.paused then
 		Sfx.pause()
 		data.paused = true
 	end
 end
 
-function resume()
+function M.resume()
 	if data.paused then
 		Sfx.resume()
 		data.paused = false
 	end
 end
 
-function update(dt)
+function M.update(dt)
 	if not data.paused then
 		for _, bkt in pairs(data.buckets) do
 			bkt:update(dt)
