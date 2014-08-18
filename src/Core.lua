@@ -98,7 +98,7 @@ function init(args)
 			on_release = true,
 			system = true,
 			handler = function(_, _, _, _)
-				State.gfx_debug = not State.gfx_debug_cross
+				State.gfx_debug_cross = not State.gfx_debug_cross
 				if State.gfx_debug_cross then
 					print("graphics crosshair debug mode enabled")
 				else
