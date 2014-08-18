@@ -136,7 +136,7 @@ end
 
 -- AudioManager interface
 
-local data = {
+M.data = M.data or {
 	__initialized = false,
 	paused = nil,
 	buckets = nil
@@ -144,14 +144,14 @@ local data = {
 
 function M.init(sound_table)
 	Util.tcheck(sound_table, "table")
-	assert(not data.__initialized)
+	assert(not M.data.__initialized)
 
-	data.paused = false
-	data.buckets = {}
-	data.__initialized = true
+	M.data.paused = false
+	M.data.buckets = {}
+	M.data.__initialized = true
 
 	for _, sd in pairs(sound_table) do
-		data.buckets[sd.__id] = M.Bucket.new(sd)
+		M.data.buckets[sd.__id] = M.Bucket.new(sd)
 	end
 end
 
@@ -161,7 +161,7 @@ function M.set_position(x, y, z)
 end
 
 function M.spawn(sound_data, x, y, z)
-	local bkt = data.buckets[sound_data.__id]
+	local bkt = M.data.buckets[sound_data.__id]
 	assert(nil ~= bkt)
 
 	bkt:spawn(
@@ -172,22 +172,22 @@ function M.spawn(sound_data, x, y, z)
 end
 
 function M.pause()
-	if not data.paused then
+	if not M.data.paused then
 		Sfx.pause()
-		data.paused = true
+		M.data.paused = true
 	end
 end
 
 function M.resume()
-	if data.paused then
+	if M.data.paused then
 		Sfx.resume()
-		data.paused = false
+		M.data.paused = false
 	end
 end
 
 function M.update(dt)
-	if not data.paused then
-		for _, bkt in pairs(data.buckets) do
+	if not M.data.paused then
+		for _, bkt in pairs(M.data.buckets) do
 			bkt:update(dt)
 		end
 	end
