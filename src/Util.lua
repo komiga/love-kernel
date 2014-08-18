@@ -46,7 +46,7 @@ function tcheck_obj(x, tc, opt)
 	end
 end
 
-function last(table)
+function table.last(table)
 	assert(0 < #table)
 	return table[#table]
 end

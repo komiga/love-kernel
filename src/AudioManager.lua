@@ -86,7 +86,7 @@ end
 function M.Bucket:spawn(x, y, z)
 	local inst
 	if 0 < #self.free then
-		inst = last(self.free)
+		inst = table.last(self.free)
 		table.remove(self.free)
 	else
 		if self:can_grow() then
