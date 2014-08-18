@@ -33,21 +33,38 @@ M.data.bind_table = {
 		end
 	},
 	["mouse1"] = {
+		on_press = true,
 		on_active = true,
-		handler = function(_, _, _, _)
-			Camera.target(
-				Camera.srel_x(HID.Mouse.getX()),
-				Camera.srel_y(HID.Mouse.getY())
-			)
+		on_release = true,
+		data = {
+			x_origin = 0,
+			y_origin = 0,
+		},
+		handler = function(_, _, kind, bind)
+			if Bind.Kind.Press == kind then
+				bind.data.x_origin = Camera.srel_x(HID.Mouse.getX())
+				bind.data.y_origin = Camera.srel_y(HID.Mouse.getY())
+			elseif Bind.Kind.Active == kind then
+				Camera.set_position(
+					bind.data.x_origin + Core.display_width_half - HID.Mouse.getX(),
+					bind.data.y_origin + Core.display_height_half - HID.Mouse.getY()
+				)
+			end
 		end
 	},
 	["mouse2"] = {
-		on_release = true,
-		handler = function(_, _, _, _)
-			Camera.target(
-				Camera.srel_x(HID.Mouse.getX()),
-				Camera.srel_y(HID.Mouse.getY())
-			)
+		on_press = true,
+		on_active = true,
+		handler = function(_, _, kind, _)
+			if
+				Bind.Kind.Active ~= kind or
+				Bind.has_modifiers_any("lctrl", "rctrl")
+			then
+				Camera.target(
+					Camera.srel_x(HID.Mouse.getX()),
+					Camera.srel_y(HID.Mouse.getY())
+				)
+			end
 		end
 	},
 	[{"up", "down", "left", "right"}] = {
@@ -241,3 +258,5 @@ function M.focus_changed(focused)
 		M.data.impl:pause(not focused)
 	end
 end
+
+return M
