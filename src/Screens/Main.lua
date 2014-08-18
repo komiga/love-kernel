@@ -40,6 +40,15 @@ M.data.bind_table = {
 			)
 		end
 	},
+	["mouse2"] = {
+		on_release = true,
+		handler = function(_, _, _, _)
+			Camera.target(
+				Camera.srel_x(HID.Mouse.getX()),
+				Camera.srel_y(HID.Mouse.getY())
+			)
+		end
+	},
 	[{"up", "down", "left", "right"}] = {
 		on_active = true,
 		handler = function(ident, _, _, _)
@@ -55,7 +64,7 @@ M.data.bind_table = {
 			end
 		end
 	},
-	[{" ", "mouse2"}] = {
+	[{" "}] = {
 		on_release = true,
 		handler = function(_, _, _, _)
 			local rx = Camera.srel_x(HID.Mouse.getX())
