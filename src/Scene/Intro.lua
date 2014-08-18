@@ -41,9 +41,9 @@ local function make_seq(seq_data)
 end
 
 function M.Impl:__init(seq, atlas, soft)
-	tcheck(seq, "table")
-	tcheck(atlas, "table")
-	tcheck(soft, "boolean", false)
+	type_assert(seq, "table")
+	type_assert(atlas, "table")
+	type_assert(soft, "boolean", false)
 
 	self.fmode_in = {}
 	self.fmode_in.animator = FieldAnimator.new(

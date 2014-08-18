@@ -10,9 +10,9 @@ require("src/FieldAnimator")
 M.Hooklet = class(M.Hooklet)
 
 function M.Hooklet:__init(props, x, y)
-	tcheck(props, "table")
-	tcheck(x, "number")
-	tcheck(y, "number")
+	type_assert(props, "table")
+	type_assert(x, "number")
+	type_assert(y, "number")
 
 	self.props = props
 	self.x = x
@@ -56,8 +56,8 @@ M.data = M.data or {
 }
 
 function M.init(hooklet_props, default_font)
-	tcheck(hooklet_props, "table")
-	tcheck_obj(default_font, "Font", true)
+	type_assert(hooklet_props, "table")
+	type_assert_obj(default_font, "Font", true)
 	assert(not M.data.__initialized)
 
 	if nil == default_font then

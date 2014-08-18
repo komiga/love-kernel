@@ -59,8 +59,8 @@ function M.Bucket.new(sound_data)
 end
 
 function M.Bucket:__init(sound_data)
-	tcheck(sound_data, "table")
-	tcheck_obj(sound_data.data, "SoundData")
+	type_assert(sound_data, "table")
+	type_assert_obj(sound_data.data, "SoundData")
 
 	self.data = sound_data
 	self.active = {}
@@ -143,7 +143,7 @@ M.data = M.data or {
 }
 
 function M.init(sound_table)
-	tcheck(sound_table, "table")
+	type_assert(sound_table, "table")
 	assert(not M.data.__initialized)
 
 	M.data.paused = false

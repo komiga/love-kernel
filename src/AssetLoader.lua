@@ -9,7 +9,7 @@ require("src/Animator")
 local Kind = {}
 
 local function get_asset_path(root_path, path, name, ext)
-	tcheck(path, "string", true)
+	type_assert(path, "string", true)
 	local p_ext = (nil ~= ext) and ('.' .. ext) or ""
 	if nil == path then
 		return root_path .. name .. p_ext
@@ -52,8 +52,8 @@ Kind.font = {
 	loader = function(root_path, name, desc)
 		local size = desc[1]
 		local default = desc.default
-		tcheck(size, "number")
-		tcheck(default, "boolean", true)
+		type_assert(size, "number")
+		type_assert(default, "boolean", true)
 
 		if default then
 			return Gfx.newFont(size)
@@ -113,9 +113,9 @@ Kind.atlas = {
 		local indexed = desc.indexed
 		local size = desc.size
 		local tex = desc.tex
-		tcheck(indexed, "boolean", true)
-		tcheck(size, "table", true)
-		tcheck(tex, "table")
+		type_assert(indexed, "boolean", true)
+		type_assert(size, "table", true)
+		type_assert(tex, "table")
 
 		local atlas = {
 			__tex = Gfx.newImage(
@@ -203,10 +203,10 @@ Kind.anim = {
 		local size = desc.size
 		local set = desc.set
 		local tight_packing = desc.tight_packing
-		tcheck(duration, "number")
-		tcheck(size, "table")
-		tcheck(set, "table")
-		tcheck(tight_packing, "boolean", true)
+		type_assert(duration, "number")
+		type_assert(size, "table")
+		type_assert(set, "table")
+		type_assert(tight_packing, "boolean", true)
 
 		local ad = {
 			duration = duration,
@@ -280,8 +280,8 @@ Kind.sound = {
 	loader = function(root_path, name, desc)
 		local policy = desc[1]
 		local limit = desc.limit
-		tcheck(policy, "number", true)
-		tcheck(limit, "number", true)
+		type_assert(policy, "number", true)
+		type_assert(limit, "number", true)
 
 		limit = optional(limit, 0)
 		policy = optional(
@@ -323,7 +323,7 @@ local function load_kind(id, root_path, kind_name, desc_table, asset_table)
 	end
 	if kind.loader then
 		for name, desc in pairs(desc_table) do
-			tcheck(desc, "table")
+			type_assert(desc, "table")
 			local asset = kind.loader(root_path, name, desc)
 			if "table" == type(asset) then
 				asset.__id = id
@@ -338,9 +338,9 @@ local function load_kind(id, root_path, kind_name, desc_table, asset_table)
 end
 
 function M.load(root_path, desc_root, asset_table)
-	tcheck(root_path, "string")
-	tcheck(desc_root, "table")
-	tcheck(asset_table, "table")
+	type_assert(root_path, "string")
+	type_assert(desc_root, "table")
+	type_assert(asset_table, "table")
 
 	local id = 1
 	for _, kind_name in pairs(LoadOrder) do

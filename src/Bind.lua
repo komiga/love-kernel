@@ -121,7 +121,7 @@ end
 M.BindGroup = class(M.BindGroup)
 
 function M.BindGroup:__init(bind_table)
-	tcheck(bind_table, "table")
+	type_assert(bind_table, "table")
 
 	self.bind_table = {}
 	self:add(bind_table)
@@ -136,12 +136,12 @@ function M.BindGroup:get_bind(ident)
 end
 
 function M.BindGroup:add(bind_table)
-	tcheck(bind_table, "table")
+	type_assert(bind_table, "table")
 
 	local check = {}
 	local expanded = {}
 	for ident, bind in pairs(bind_table) do
-		tcheck(bind, "table")
+		type_assert(bind, "table")
 		bind.ident = ident
 		if "table" == type(ident) then
 			for _, sub_ident in pairs(ident) do
@@ -158,9 +158,9 @@ end
 
 -- Bind interface
 
-function M.tcheck(group, opt)
+function M.type_assert(group, opt)
 	opt = optional(opt, false)
-	tcheck(group, "table", opt)
+	type_assert(group, "table", opt)
 	assert((not group and opt) or M.BindGroup == group.__index)
 end
 
@@ -169,9 +169,9 @@ function M.new_group(bind_table)
 end
 
 function M.init(global_group, gate_fn, enable_mouse)
-	tcheck(global_group, "table")
-	tcheck(gate_fn, "function")
-	tcheck(enable_mouse, "boolean", true)
+	type_assert(global_group, "table")
+	type_assert(gate_fn, "function")
+	type_assert(enable_mouse, "boolean", true)
 
 	assert(not M.data.__initialized)
 
@@ -193,14 +193,14 @@ function M.set_gate(gate_fn)
 end
 
 function M.push_group(group)
-	Bind.tcheck(group)
+	Bind.type_assert(group)
 
 	table.insert(M.data.stack, group)
 end
 
 function M.pop_group(group)
 	assert(0 < Bind.count())
-	Bind.tcheck(group)
+	Bind.type_assert(group)
 
 	assert(group == M.data.stack[Bind.count()])
 	table.remove(M.data.stack)

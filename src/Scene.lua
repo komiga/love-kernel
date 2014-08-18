@@ -15,14 +15,14 @@ M.data = M.data or {
 M.Unit = class(M.Unit)
 
 function M.Unit:__init(impl, bind_group, transparent)
-	tcheck(impl, "table")
-	tcheck(impl.notify_pushed, "function", true)
-	tcheck(impl.notify_popped, "function", true)
-	tcheck(impl.update, "function")
-	tcheck(impl.render, "function")
-	tcheck(impl.bind_gate, "function", true)
-	Bind.tcheck(bind_group, true)
-	tcheck(transparent, "boolean", true)
+	type_assert(impl, "table")
+	type_assert(impl.notify_pushed, "function", true)
+	type_assert(impl.notify_popped, "function", true)
+	type_assert(impl.update, "function")
+	type_assert(impl.render, "function")
+	type_assert(impl.bind_gate, "function", true)
+	Bind.type_assert(bind_group, true)
+	type_assert(transparent, "boolean", true)
 
 	self.impl = impl
 	self.impl.scene_unit = self

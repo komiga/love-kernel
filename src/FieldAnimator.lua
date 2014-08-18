@@ -15,11 +15,11 @@ FieldAnimator.Mode = {
 M.Unit = class(M.Unit)
 
 function M.Unit:__init(duration, fields, trans, mode, serial_reset_callback)
-	tcheck(duration, "number")
-	tcheck(fields, "table")
-	tcheck(trans, "table")
-	tcheck(mode, "number", true)
-	tcheck(serial_reset_callback, "function", true)
+	type_assert(duration, "number")
+	type_assert(fields, "table")
+	type_assert(trans, "table")
+	type_assert(mode, "number", true)
+	type_assert(serial_reset_callback, "function", true)
 
 	self.duration = duration
 	self.fields = fields
@@ -34,7 +34,7 @@ function M.Unit:is_complete()
 end
 
 function M.Unit:reset(new_duration)
-	tcheck(new_duration, "number", true)
+	type_assert(new_duration, "number", true)
 	self.duration = optional(new_duration, self.duration)
 	self.time = 0.0
 	self.total = 0.0

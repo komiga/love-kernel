@@ -23,9 +23,9 @@ end
 M.Unit = class(M.Unit)
 
 function M.Unit:__init(x, y, speed)
-	tcheck(x, "number")
-	tcheck(y, "number")
-	tcheck(speed, "number", true)
+	type_assert(x, "number")
+	type_assert(y, "number")
+	type_assert(speed, "number", true)
 
 	speed = optional(speed, 0)
 

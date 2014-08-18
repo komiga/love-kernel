@@ -27,7 +27,7 @@ function optional(value, default)
 		or default
 end
 
-function tcheck(x, tc, opt)
+function type_assert(x, tc, opt)
 	opt = optional(opt, false)
 	assert(
 		tc == type(x)
@@ -35,7 +35,7 @@ function tcheck(x, tc, opt)
 	)
 end
 
-function tcheck_obj(x, tc, opt)
+function type_assert_obj(x, tc, opt)
 	opt = optional(opt, false)
 	if nil == x then
 		assert(opt)

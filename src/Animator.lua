@@ -27,9 +27,9 @@ local BatchModeName = {
 M.Instance = class(M.Instance)
 
 function M.Instance:__init(ad, sindex, mode)
-	tcheck(ad, "table")
-	tcheck(sindex, "number", true)
-	tcheck(mode, "number", true)
+	type_assert(ad, "table")
+	type_assert(sindex, "number", true)
+	type_assert(mode, "number", true)
 
 	assert(1 <= sindex and #ad.set >= sindex)
 
@@ -110,9 +110,9 @@ end
 M.Batcher = class(M.Batcher)
 
 function M.Batcher:__init(ad, limit, mode)
-	tcheck(ad, "table")
-	tcheck(limit, "number")
-	tcheck(mode, "number", true)
+	type_assert(ad, "table")
+	type_assert(limit, "number")
+	type_assert(mode, "number", true)
 
 	mode = optional(mode, Animator.BatchMode.Dynamic)
 
@@ -173,7 +173,7 @@ M.data = M.data or {
 }
 
 function M.init(anim_table)
-	tcheck(anim_table, "table")
+	type_assert(anim_table, "table")
 	assert(not M.data.__initialized)
 
 	M.data.__initialized = true

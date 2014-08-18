@@ -14,7 +14,7 @@ function M.Unit:__init(duration)
 end
 
 function M.Unit:reset(new_duration)
-	tcheck(new_duration, "number", true)
+	type_assert(new_duration, "number", true)
 	self.duration = optional(new_duration, duration)
 	self.elapsed = 0.0
 	self.ticks = 0
