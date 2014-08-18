@@ -122,6 +122,7 @@ function init(args)
 
 	-- default rendering state
 	Gfx.setFont(Asset.font.main)
+	Gfx.setLineWidth(2.0)
 	Gfx.setColor(255,255,255, 255)
 	Gfx.setBackgroundColor(0,0,0, 255)
 
