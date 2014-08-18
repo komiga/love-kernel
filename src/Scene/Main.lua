@@ -1,17 +1,19 @@
 
-MainScreen = MainScreen or {}
-local M = MainScreen
+MainScene = MainScene or {}
+local M = MainScene
 
 require("src/State")
 require("src/Util")
 require("src/Bind")
-require("src/Screen")
+require("src/Scene")
 require("src/Camera")
 require("src/AudioManager")
 require("src/Hooker")
 require("src/Animator")
 require("src/AssetLoader")
 require("src/Asset")
+
+require("src/Scene/Intro")
 
 M.data = M.data or {
 	__initialized = false,
@@ -108,7 +110,7 @@ function M.Impl:__init()
 end
 
 function M.Impl:push_intro()
-	Screen.push(IntroScreen.new(
+	Scene.push(IntroScene.new(
 		Asset.intro_seq,
 		Asset.atlas.intro_seq,
 		false,
@@ -118,7 +120,7 @@ end
 
 function M.Impl:pause(on)
 	if not State.pause_lock then
-		if self.screen_unit:is_top() then
+		if self.scene_unit:is_top() then
 			Core.pause(on)
 		else
 			self.pending_pause = on
@@ -199,7 +201,7 @@ function M.Impl:render()
 	Camera.unlock()
 end
 
--- MainScreen interface
+-- MainScene interface
 
 local function __static_init()
 	Camera.init(
@@ -217,7 +219,7 @@ local function new(transparent)
 	__static_init()
 
 	local impl = new_object(M.Impl)
-	return Screen.new(impl, M.data.bind_group, transparent)
+	return Scene.new(impl, M.data.bind_group, transparent)
 end
 
 function M.init(_)

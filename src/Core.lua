@@ -5,13 +5,12 @@ local M = Core
 require("src/State")
 require("src/Util")
 require("src/Bind")
-require("src/Screen")
+require("src/Scene")
 require("src/AudioManager")
 require("src/Animator")
 require("src/AssetLoader")
 
-require("src/Screens/Main")
-require("src/Screens/Intro")
+require("src/Scene/Main")
 
 M.data = M.data or {
 	bind_table = nil,
@@ -36,7 +35,7 @@ function M.bind_gate(bind, ident, dt, kind)
 	if State.paused then
 		return false
 	end
-	return Screen.bind_gate(bind, ident, dt, kind)
+	return Scene.bind_gate(bind, ident, dt, kind)
 end
 
 function M.init(args)
@@ -113,7 +112,7 @@ function M.init(args)
 
 	-- more systems
 	Animator.init(Asset.anim)
-	Screen.init()
+	Scene.init()
 
 	-- default rendering state
 	Gfx.setFont(Asset.font.main)
@@ -121,7 +120,7 @@ function M.init(args)
 	Gfx.setColor(255,255,255, 255)
 	Gfx.setBackgroundColor(0,0,0, 255)
 
-	Screen.push(MainScreen.init(args))
+	Scene.push(MainScene.init(args))
 
 	-- Ensure debug is disabled after initialization
 	if debug_mode_temp then
@@ -130,7 +129,7 @@ function M.init(args)
 end
 
 function M.deinit()
-	Screen.clear()
+	Scene.clear()
 end
 
 function M.exit()
@@ -166,12 +165,12 @@ function M.update(dt)
 		Bind.update(dt)
 		AudioManager.update(dt)
 	end
-	Screen.update(dt)
+	Scene.update(dt)
 end
 
 function M.render()
 	Gfx.setColor(255,255,255, 255)
-	Screen.render()
+	Scene.render()
 
 	if State.gfx_debug then
 		Gfx.setColor(192,192,192, 200)

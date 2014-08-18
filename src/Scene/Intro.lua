@@ -1,11 +1,11 @@
 
-IntroScreen = IntroScreen or {}
-local M = IntroScreen
+IntroScene = IntroScene or {}
+local M = IntroScene
 
 require("src/State")
 require("src/Util")
 require("src/Bind")
-require("src/Screen")
+require("src/Scene")
 require("src/AudioManager")
 require("src/FieldAnimator")
 require("src/AssetLoader")
@@ -118,7 +118,7 @@ end
 
 function M.Impl:terminate()
 	log_debug("Intro:terminate()")
-	Screen.pop(self.screen_unit)
+	Scene.pop(self.scene_unit)
 end
 
 function M.Impl:reset()
@@ -218,7 +218,7 @@ function M.Impl:render()
 	end
 end
 
--- IntroScreen interface
+-- IntroScene interface
 
 local function __static_init()
 end
@@ -227,5 +227,5 @@ function M.new(seq, atlas, soft, transparent)
 	__static_init()
 
 	local impl = new_object(M.Impl, seq, atlas, soft)
-	return Screen.new(impl, nil, transparent)
+	return Scene.new(impl, nil, transparent)
 end

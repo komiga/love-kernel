@@ -1,11 +1,11 @@
 
-STUBScreen = STUBScreen or {}
-local M = STUBScreen
+STUBScene = STUBScene or {}
+local M = STUBScene
 
 require("src/State")
 require("src/Util")
 require("src/Bind")
-require("src/Screen")
+require("src/Scene")
 require("src/Camera")
 require("src/AudioManager")
 require("src/FieldAnimator")
@@ -80,7 +80,7 @@ function M.Impl:render()
 	Camera.unlock()
 end
 
--- STUBScreen interface
+-- STUBScene interface
 
 local function __static_init()
 	if not M.data.bind_group then
@@ -93,7 +93,7 @@ end
 	__static_init()
 
 	local impl = new_object(M.Impl)
-	return Screen.new(impl, M.data.bind_group, transparent)
+	return Scene.new(impl, M.data.bind_group, transparent)
 end
 
 -- Singleton
