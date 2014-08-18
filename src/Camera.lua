@@ -22,41 +22,48 @@ end
 
 M.Unit = Util.class(M.Unit)
 
-function M.Unit:__init(x, y, x_speed, y_speed)
+function M.Unit:__init(x, y, speed)
 	Util.tcheck(x, "number")
 	Util.tcheck(y, "number")
-	Util.tcheck(x_speed, "number", true)
-	Util.tcheck(y_speed, "number", true)
+	Util.tcheck(speed, "number", true)
 
-	x_speed = Util.optional(x_speed, 0)
-	y_speed = Util.optional(y_speed, 0)
+	speed = Util.optional(speed, 0)
 
 	self.x = x
 	self.y = y
-	self.x_speed = x_speed
-	self.y_speed = y_speed
-	self.x_target = x
-	self.y_target = y
+	self.speed = speed
+	self.time = 0
+	self.distance = 0
+	self.x_origin = 0
+	self.y_origin = 0
+	self.x_target = 0
+	self.y_target = 0
+	self.x_speed = 0
+	self.y_speed = 0
 	self.locked = false
 end
 
 function M.Unit:set_position(x, y)
+	self.distance = 0
 	self.x = x
 	self.y = y
-	self.x_target = x
-	self.y_target = y
 end
 
 function M.Unit:target(x, y)
-	if 0 == self.x_speed then
+	if 0 == self.speed then
 		self.x = x
-	else
-		self.x_target = x
-	end
-	if 0 == self.y_speed then
 		self.y = y
-	else
+	elseif x ~= self.x or y ~= self.y then
+		local rx = x - self.x
+		local ry = y - self.y
+		self.time = 0
+		self.distance = math.sqrt((rx * rx) + (ry * ry))
+		self.x_origin = self.x
+		self.y_origin = self.y
+		self.x_target = x
 		self.y_target = y
+		self.x_speed = rx / self.distance
+		self.y_speed = ry / self.distance
 	end
 end
 
@@ -65,22 +72,17 @@ function M.Unit:move(x, y)
 end
 
 function M.Unit:update(dt)
-	local delta
-	if self.x ~= self.x_target then
-		delta = self.x_speed * dt
-		self.x = Util.ternary(
-			self.x < self.x_target,
-			math.min(self.x + delta, self.x_target),
-			math.max(self.x - delta, self.x_target)
-		)
-	end
-	if self.y ~= self.y_target then
-		delta = self.y_speed * dt
-		self.y = Util.ternary(
-			self.y < self.y_target,
-			math.min(self.y + delta, self.y_target),
-			math.max(self.y - delta, self.y_target)
-		)
+	if 0 ~= self.distance then
+		self.time = self.time + dt
+		local travelled = self.time * self.speed
+		if travelled >= self.distance then
+			self.distance = 0
+			self.x = self.x_target
+			self.y = self.y_target
+		else
+			self.x = self.x_origin + travelled * self.x_speed
+			self.y = self.y_origin + travelled * self.y_speed
+		end
 	end
 end
 
@@ -101,16 +103,16 @@ end
 
 -- Camera interface
 
--- If x_speed or y_speed are 0, :move() and :target()
+-- If speed is 0, :move() and :target()
 -- are the same as :set_position()
-function M.new(x, y, x_speed, y_speed)
-	return Util.new_object(M.Unit, x, y, x_speed, y_speed)
+function M.new(x, y, speed)
+	return Util.new_object(M.Unit, x, y, speed)
 end
 
-function M.init(x, y, x_speed, y_speed)
+function M.init(x, y, speed)
 	assert(not M.data.__initialized)
 
-	M.data.cam = Camera.new(x, y, x_speed, y_speed)
+	M.data.cam = Camera.new(x, y, speed)
 
 	M.data.__initialized = true
 	return M.data.cam

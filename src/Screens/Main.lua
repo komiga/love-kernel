@@ -205,7 +205,7 @@ end
 local function __static_init()
 	Camera.init(
 		Core.display_width_half, Core.display_height_half,
-		400.0, 400.0
+		400.0
 	)
 
 	if not M.data.bind_group then
