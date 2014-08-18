@@ -20,14 +20,14 @@ end
 
 -- class Camera
 
-M.Unit = Util.class(M.Unit)
+M.Unit = class(M.Unit)
 
 function M.Unit:__init(x, y, speed)
-	Util.tcheck(x, "number")
-	Util.tcheck(y, "number")
-	Util.tcheck(speed, "number", true)
+	tcheck(x, "number")
+	tcheck(y, "number")
+	tcheck(speed, "number", true)
 
-	speed = Util.optional(speed, 0)
+	speed = optional(speed, 0)
 
 	self.x = x
 	self.y = y
@@ -106,7 +106,7 @@ end
 -- If speed is 0, :move() and :target()
 -- are the same as :set_position()
 function M.new(x, y, speed)
-	return Util.new_object(M.Unit, x, y, speed)
+	return new_object(M.Unit, x, y, speed)
 end
 
 function M.init(x, y, speed)

@@ -12,19 +12,19 @@ FieldAnimator.Mode = {
 
 -- class FieldAnimator
 
-M.Unit = Util.class(M.Unit)
+M.Unit = class(M.Unit)
 
 function M.Unit:__init(duration, fields, trans, mode, serial_reset_callback)
-	Util.tcheck(duration, "number")
-	Util.tcheck(fields, "table")
-	Util.tcheck(trans, "table")
-	Util.tcheck(mode, "number", true)
-	Util.tcheck(serial_reset_callback, "function", true)
+	tcheck(duration, "number")
+	tcheck(fields, "table")
+	tcheck(trans, "table")
+	tcheck(mode, "number", true)
+	tcheck(serial_reset_callback, "function", true)
 
 	self.duration = duration
 	self.fields = fields
 	self.trans = trans
-	self.mode = Util.optional(mode, FieldAnimator.Mode.Stop)
+	self.mode = optional(mode, FieldAnimator.Mode.Stop)
 	self.serial_reset_callback = serial_reset_callback
 	self:reset()
 end
@@ -34,8 +34,8 @@ function M.Unit:is_complete()
 end
 
 function M.Unit:reset(new_duration)
-	Util.tcheck(new_duration, "number", true)
-	self.duration = Util.optional(new_duration, self.duration)
+	tcheck(new_duration, "number", true)
+	self.duration = optional(new_duration, self.duration)
 	self.time = 0.0
 	self.total = 0.0
 	self.picked = {}
@@ -43,7 +43,7 @@ function M.Unit:reset(new_duration)
 		if "table" == type(t[1]) then
 			-- trans for field is a table of variants
 			-- instead of a direct (base,target) pair
-			local index = Util.random(1, #t)
+			local index = random(1, #t)
 			self.picked[f] = index
 		end
 		local value = self:get_field_trans(f)[1]
@@ -117,5 +117,5 @@ end
 -- FieldAnimator interface
 
 function M.new(duration, fields, trans, mode, serial_reset_callback)
-	return Util.new_object(M.Unit, duration, fields, trans, mode, serial_reset_callback)
+	return new_object(M.Unit, duration, fields, trans, mode, serial_reset_callback)
 end

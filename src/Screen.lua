@@ -12,22 +12,22 @@ M.data = M.data or {
 
 -- class Screen
 
-M.Unit = Util.class(M.Unit)
+M.Unit = class(M.Unit)
 
 function M.Unit:__init(impl, bind_group, transparent)
-	Util.tcheck(impl, "table")
-	Util.tcheck(impl.notify_pushed, "function", true)
-	Util.tcheck(impl.notify_popped, "function", true)
-	Util.tcheck(impl.update, "function")
-	Util.tcheck(impl.render, "function")
-	Util.tcheck(impl.bind_gate, "function", true)
+	tcheck(impl, "table")
+	tcheck(impl.notify_pushed, "function", true)
+	tcheck(impl.notify_popped, "function", true)
+	tcheck(impl.update, "function")
+	tcheck(impl.render, "function")
+	tcheck(impl.bind_gate, "function", true)
 	Bind.tcheck(bind_group, true)
-	Util.tcheck(transparent, "boolean", true)
+	tcheck(transparent, "boolean", true)
 
 	self.impl = impl
 	self.impl.screen_unit = self
 	self.bind_group = bind_group
-	self.transparent = Util.optional(transparent, false)
+	self.transparent = optional(transparent, false)
 end
 
 function M.Unit:is_transparent()
@@ -80,7 +80,7 @@ end
 -- Screen interface
 
 function M.new(impl, bind_group, transparent)
-	return Util.new_object(M.Unit, impl, bind_group, transparent)
+	return new_object(M.Unit, impl, bind_group, transparent)
 end
 
 function M.init()
@@ -104,7 +104,7 @@ end
 
 function M.pop(screen)
 	if 0 == M.count() then
-		Util.debug("Screen.pop(): attempted to pop on empty stack")
+		log_debug("Screen.pop(): attempted to pop on empty stack")
 	end
 	assert(nil ~= screen and screen == M.current())
 

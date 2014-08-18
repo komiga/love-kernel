@@ -15,28 +15,28 @@ function M.init()
 	math.randomseed(os.time())
 end
 
-function M.ternary(cond, x, y)
+function ternary(cond, x, y)
 	return (cond)
 		and x
 		or  y
 end
 
-function M.optional(value, default)
+function optional(value, default)
 	return (nil ~= value)
 		and value
 		or default
 end
 
-function M.tcheck(x, tc, opt)
-	opt = Util.optional(opt, false)
+function tcheck(x, tc, opt)
+	opt = optional(opt, false)
 	assert(
 		tc == type(x)
 		or (opt and nil == x)
 	)
 end
 
-function M.tcheck_obj(x, tc, opt)
-	opt = Util.optional(opt, false)
+function tcheck_obj(x, tc, opt)
+	opt = optional(opt, false)
 	if nil == x then
 		assert(opt)
 	else
@@ -46,32 +46,35 @@ function M.tcheck_obj(x, tc, opt)
 	end
 end
 
-function M.last(table)
+function last(table)
 	assert(0 < #table)
 	return table[#table]
 end
 
-function M.debug_sub(sub, msg, ...)
-	if true == sub then
-		local info = debug.getinfo(3, "Sl")
+function log_debug_sys(sys, msg, ...)
+	if true == sys then
+		local info = debug.getinfo(2, "Sl")
 		print(info.short_src .. " @ " .. info.currentline .. ": debug: " .. msg, ...)
 	end
 end
 
-function M.debug(msg, ...)
-	M.debug_sub(State.gen_debug, msg, ...)
+function log_debug(msg, ...)
+	if true == State.gen_debug then
+		local info = debug.getinfo(2, "Sl")
+		print(info.short_src .. " @ " .. info.currentline .. ": debug: " .. msg, ...)
+	end
 end
 
-function M.random(x, y)
+function random(x, y)
 	--return M.data.rng:value(x, y)
 	return math.random(x, y)
 end
 
-function M.choose_random(table)
-	return table[Util.random(1, #table)]
+function choose_random(table)
+	return table[random(1, #table)]
 end
 
-function M.class(c)
+function class(c)
 	if nil == c then
 		c = {}
 		c.__index = c
@@ -89,7 +92,7 @@ function M.class(c)
 	return c
 end
 
-function M.new_object(c, ...)
+function new_object(c, ...)
 	local obj = {}
 	setmetatable(obj, c)
 
@@ -101,10 +104,10 @@ end
 --	(rgba, alpha_opt),
 --	(rgb, alpha), or
 --	(rgb) with alpha = 255
-function M.set_color_table(rgb, alpha)
-	alpha = Util.optional(
+function set_color_table(rgb, alpha)
+	alpha = optional(
 		alpha,
-		Util.optional(rgb[4], 255)
+		optional(rgb[4], 255)
 	)
 	Gfx.setColor(rgb[1],rgb[2],rgb[3], alpha)
 end

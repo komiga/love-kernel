@@ -68,7 +68,7 @@ M.data.bind_table = {
 		handler = function(_, _, _, _)
 			local rx = Camera.srel_x(HID.Mouse.getX())
 			local ry = Camera.srel_y(HID.Mouse.getY())
-			--AudioManager.spawn(Asset.sound.waaauu)
+			AudioManager.spawn(Asset.sound.waaauu)
 			Hooker.spawn(
 				Asset.hooklets.KUMQUAT,
 				rx,ry
@@ -91,7 +91,7 @@ M.data.bind_table = {
 
 -- class Impl
 
-M.Impl = Util.class(M.Impl)
+M.Impl = class(M.Impl)
 
 function M.Impl:__init()
 	local anim_data = Asset.anim.moving_square
@@ -216,7 +216,7 @@ end
 local function new(transparent)
 	__static_init()
 
-	local impl = Util.new_object(M.Impl)
+	local impl = new_object(M.Impl)
 	return Screen.new(impl, M.data.bind_group, transparent)
 end
 

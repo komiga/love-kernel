@@ -32,7 +32,7 @@ local Mode = {
 	Out = 3
 }
 
-M.Impl = Util.class(M.Impl)
+M.Impl = class(M.Impl)
 
 local function make_seq(seq_data)
 	assert(nil ~= seq_data)
@@ -41,9 +41,9 @@ local function make_seq(seq_data)
 end
 
 function M.Impl:__init(seq, atlas, soft)
-	Util.tcheck(seq, "table")
-	Util.tcheck(atlas, "table")
-	Util.tcheck(soft, "boolean", false)
+	tcheck(seq, "table")
+	tcheck(atlas, "table")
+	tcheck(soft, "boolean", false)
 
 	self.fmode_in = {}
 	self.fmode_in.animator = FieldAnimator.new(
@@ -82,7 +82,7 @@ function M.Impl:fmode()
 	if self.mode == Mode.Stay then
 		return nil
 	end
-	return Util.ternary(
+	return ternary(
 		self.mode == Mode.In,
 		self.fmode_in,
 		self.fmode_out
@@ -93,7 +93,7 @@ function M.Impl:animator()
 	if self.mode == Mode.Stay then
 		return nil
 	end
-	return Util.ternary(
+	return ternary(
 		self.mode == Mode.In,
 		self.fmode_in.animator,
 		self.fmode_out.animator
@@ -117,7 +117,7 @@ function M.Impl:is_finishing()
 end
 
 function M.Impl:terminate()
-	Util.debug("Intro:terminate()")
+	log_debug("Intro:terminate()")
 	Screen.pop(self.screen_unit)
 end
 
@@ -130,7 +130,7 @@ function M.Impl:reset()
 end
 
 function M.Impl:notify_pushed()
-	Util.debug("Intro:notify_pushed")
+	log_debug("Intro:notify_pushed")
 	self:reset()
 end
 
@@ -138,7 +138,7 @@ function M.Impl:notify_became_top()
 end
 
 function M.Impl:notify_popped()
-	Util.debug("Intro:notify_popped")
+	log_debug("Intro:notify_popped")
 end
 
 function M.Impl:bind_gate(bind, ident, dt, kind)
@@ -161,7 +161,7 @@ function M.Impl:update(dt)
 			if self:is_last() then
 				self.fmode_out_bg.animator:reset(
 					self:current_seq().fade +
-					Util.ternary(not self:is_soft(), 0.25, 0.0)
+					ternary(not self:is_soft(), 0.25, 0.0)
 				)
 			end
 			self:animator():reset(self:current_seq().fade)
@@ -192,7 +192,7 @@ end
 function M.Impl:render()
 	Gfx.setColor(
 		0,0,0,
-		Util.ternary(
+		ternary(
 			self:is_soft(),
 			self.fmode_out_bg.alpha,
 			255
@@ -226,6 +226,6 @@ end
 function M.new(seq, atlas, soft, transparent)
 	__static_init()
 
-	local impl = Util.new_object(M.Impl, seq, atlas, soft)
+	local impl = new_object(M.Impl, seq, atlas, soft)
 	return Screen.new(impl, nil, transparent)
 end

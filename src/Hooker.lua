@@ -7,12 +7,12 @@ require("src/FieldAnimator")
 
 -- class Hooklet
 
-M.Hooklet = Util.class(M.Hooklet)
+M.Hooklet = class(M.Hooklet)
 
 function M.Hooklet:__init(props, x, y)
-	Util.tcheck(props, "table")
-	Util.tcheck(x, "number")
-	Util.tcheck(y, "number")
+	tcheck(props, "table")
+	tcheck(x, "number")
+	tcheck(y, "number")
 
 	self.props = props
 	self.x = x
@@ -36,7 +36,7 @@ function M.Hooklet:update(dt)
 end
 
 function M.Hooklet:render()
-	Util.set_color_table(self.props.color, self.fields.alpha)
+	set_color_table(self.props.color, self.fields.alpha)
 	Gfx.setFont(self.props.font)
 	Gfx.print(
 		self.props.text,
@@ -56,8 +56,8 @@ M.data = M.data or {
 }
 
 function M.init(hooklet_props, default_font)
-	Util.tcheck(hooklet_props, "table")
-	Util.tcheck_obj(default_font, "Font", true)
+	tcheck(hooklet_props, "table")
+	tcheck_obj(default_font, "Font", true)
 	assert(not M.data.__initialized)
 
 	if nil == default_font then
@@ -103,7 +103,7 @@ function M.clear_specific(props)
 end
 
 function M.spawn(props, x, y)
-	local hkl = Util.new_object(M.Hooklet, props, x, y)
+	local hkl = new_object(M.Hooklet, props, x, y)
 	table.insert(M.data.active, hkl)
 end
 

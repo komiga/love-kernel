@@ -24,17 +24,17 @@ local BatchModeName = {
 
 -- class Instance
 
-M.Instance = Util.class(M.Instance)
+M.Instance = class(M.Instance)
 
 function M.Instance:__init(ad, sindex, mode)
-	Util.tcheck(ad, "table")
-	Util.tcheck(sindex, "number", true)
-	Util.tcheck(mode, "number", true)
+	tcheck(ad, "table")
+	tcheck(sindex, "number", true)
+	tcheck(mode, "number", true)
 
 	assert(1 <= sindex and #ad.set >= sindex)
 
-	sindex = Util.optional(sindex, 1)
-	mode = Util.optional(mode, M.Mode.Stop)
+	sindex = optional(sindex, 1)
+	mode = optional(mode, M.Mode.Stop)
 
 	self.batch_id = nil
 	self.data = ad
@@ -107,14 +107,14 @@ end
 
 -- class Batcher
 
-M.Batcher = Util.class(M.Batcher)
+M.Batcher = class(M.Batcher)
 
 function M.Batcher:__init(ad, limit, mode)
-	Util.tcheck(ad, "table")
-	Util.tcheck(limit, "number")
-	Util.tcheck(mode, "number", true)
+	tcheck(ad, "table")
+	tcheck(limit, "number")
+	tcheck(mode, "number", true)
 
-	mode = Util.optional(mode, Animator.BatchMode.Dynamic)
+	mode = optional(mode, Animator.BatchMode.Dynamic)
 
 	self.data = ad
 	self.limit = limit
@@ -151,7 +151,7 @@ function M.Batcher:add(inst, x,y, r, sx,sy, ox,oy)
 		)
 	else
 		if self.limit <= #self.active then
-			Util.debug("Batcher: batch full")
+			log_debug("Batcher: batch full")
 		else
 			local batch_id = self.batch:add(
 				inst.set[inst.frame],
@@ -173,7 +173,7 @@ M.data = M.data or {
 }
 
 function M.init(anim_table)
-	Util.tcheck(anim_table, "table")
+	tcheck(anim_table, "table")
 	assert(not M.data.__initialized)
 
 	M.data.__initialized = true

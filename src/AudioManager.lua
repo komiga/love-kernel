@@ -15,10 +15,10 @@ M.InstancePolicy = {
 
 -- class SoundInstance
 
-M.SoundInstance = Util.class(M.SoundInstance)
+M.SoundInstance = class(M.SoundInstance)
 
 function M.SoundInstance.new(sound_data, x, y, z)
-	return Util.new_object(M.SoundInstance, sound_data, x, y, z)
+	return new_object(M.SoundInstance, sound_data, x, y, z)
 end
 
 function M.SoundInstance:__init(sound_data, x, y, z)
@@ -52,15 +52,15 @@ end
 
 -- class Bucket
 
-M.Bucket = Util.class(M.Bucket)
+M.Bucket = class(M.Bucket)
 
 function M.Bucket.new(sound_data)
-	return Util.new_object(M.Bucket, sound_data)
+	return new_object(M.Bucket, sound_data)
 end
 
 function M.Bucket:__init(sound_data)
-	Util.tcheck(sound_data, "table")
-	Util.tcheck_obj(sound_data.data, "SoundData")
+	tcheck(sound_data, "table")
+	tcheck_obj(sound_data.data, "SoundData")
 
 	self.data = sound_data
 	self.active = {}
@@ -86,7 +86,7 @@ end
 function M.Bucket:spawn(x, y, z)
 	local inst
 	if 0 < #self.free then
-		inst = Util.last(self.free)
+		inst = last(self.free)
 		table.remove(self.free)
 	else
 		if self:can_grow() then
@@ -101,7 +101,7 @@ function M.Bucket:spawn(x, y, z)
 	end
 	if nil ~= inst then
 		table.insert(self.active, inst)
-		Util.debug_sub(State.sfx_debug,
+		log_debug_sys(State.sfx_debug,
 			"sound spawned: " .. self.data.__name .. ": " .. #self.active
 		)
 		inst:play()
@@ -113,7 +113,7 @@ function M.Bucket:update(dt)
 	if 0 < #self.active then
 		for i, inst in pairs(self.active) do
 			if not inst:update(dt) then
-				Util.debug_sub(State.sfx_debug,
+				log_debug_sys(State.sfx_debug,
 					"sound ended: " .. self.data.__name .. ": " .. i
 				)
 				table.remove(self.active, i)
@@ -123,10 +123,10 @@ function M.Bucket:update(dt)
 					or (M.InstancePolicy.Reserve == policy
 						and self.count <= self.data.limit)
 				then
-					Util.debug_sub(State.sfx_debug, "  (kept)")
+					log_debug_sys(State.sfx_debug, "  (kept)")
 					table.insert(self.free, inst)
 				else
-					Util.debug_sub(State.sfx_debug, "  (murdered)")
+					log_debug_sys(State.sfx_debug, "  (murdered)")
 					self.count = self.count - 1
 				end
 			end
@@ -143,7 +143,7 @@ M.data = M.data or {
 }
 
 function M.init(sound_table)
-	Util.tcheck(sound_table, "table")
+	tcheck(sound_table, "table")
 	assert(not M.data.__initialized)
 
 	M.data.paused = false
@@ -156,8 +156,8 @@ function M.init(sound_table)
 end
 
 function M.set_position(x, y, z)
-	Sfx.setPosition(x, y, Util.optional(z, 0.0))
-	--Util.debug("AudioManager.set_position: ", x, y, z)
+	Sfx.setPosition(x, y, optional(z, 0.0))
+	--log_debug("AudioManager.set_position: ", x, y, z)
 end
 
 function M.spawn(sound_data, x, y, z)
@@ -165,9 +165,9 @@ function M.spawn(sound_data, x, y, z)
 	assert(nil ~= bkt)
 
 	bkt:spawn(
-		Util.optional(x, 0.0),
-		Util.optional(y, 0.0),
-		Util.optional(z, 0.0)
+		optional(x, 0.0),
+		optional(y, 0.0),
+		optional(z, 0.0)
 	)
 end
 

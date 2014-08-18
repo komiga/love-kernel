@@ -6,7 +6,7 @@ require("src/Util")
 
 -- class Timer
 
-M.Unit = Util.class(M.Unit)
+M.Unit = class(M.Unit)
 
 function M.Unit:__init(duration)
 	self.duration = 0.0
@@ -14,8 +14,8 @@ function M.Unit:__init(duration)
 end
 
 function M.Unit:reset(new_duration)
-	Util.tcheck(new_duration, "number", true)
-	self.duration = Util.optional(new_duration, duration)
+	tcheck(new_duration, "number", true)
+	self.duration = optional(new_duration, duration)
 	self.elapsed = 0.0
 	self.ticks = 0
 end
@@ -51,5 +51,5 @@ end
 -- Timer interface
 
 function M.new(duration)
-	return Util.new_object(M.Unit, duration)
+	return new_object(M.Unit, duration)
 end

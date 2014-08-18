@@ -9,7 +9,7 @@ require("src/Animator")
 local Kind = {}
 
 local function get_asset_path(root_path, path, name, ext)
-	Util.tcheck(path, "string", true)
+	tcheck(path, "string", true)
 	local p_ext = (nil ~= ext) and ('.' .. ext) or ""
 	if nil == path then
 		return root_path .. name .. p_ext
@@ -52,8 +52,8 @@ Kind.font = {
 	loader = function(root_path, name, desc)
 		local size = desc[1]
 		local default = desc.default
-		Util.tcheck(size, "number")
-		Util.tcheck(default, "boolean", true)
+		tcheck(size, "number")
+		tcheck(default, "boolean", true)
 
 		if default then
 			return Gfx.newFont(size)
@@ -113,9 +113,9 @@ Kind.atlas = {
 		local indexed = desc.indexed
 		local size = desc.size
 		local tex = desc.tex
-		Util.tcheck(indexed, "boolean", true)
-		Util.tcheck(size, "table", true)
-		Util.tcheck(tex, "table")
+		tcheck(indexed, "boolean", true)
+		tcheck(size, "table", true)
+		tcheck(tex, "table")
 
 		local atlas = {
 			__tex = Gfx.newImage(
@@ -203,10 +203,10 @@ Kind.anim = {
 		local size = desc.size
 		local set = desc.set
 		local tight_packing = desc.tight_packing
-		Util.tcheck(duration, "number")
-		Util.tcheck(size, "table")
-		Util.tcheck(set, "table")
-		Util.tcheck(tight_packing, "boolean", true)
+		tcheck(duration, "number")
+		tcheck(size, "table")
+		tcheck(set, "table")
+		tcheck(tight_packing, "boolean", true)
 
 		local ad = {
 			duration = duration,
@@ -280,13 +280,13 @@ Kind.sound = {
 	loader = function(root_path, name, desc)
 		local policy = desc[1]
 		local limit = desc.limit
-		Util.tcheck(policy, "number", true)
-		Util.tcheck(limit, "number", true)
+		tcheck(policy, "number", true)
+		tcheck(limit, "number", true)
 
-		limit = Util.optional(limit, 0)
-		policy = Util.optional(
+		limit = optional(limit, 0)
+		policy = optional(
 			policy,
-			Util.ternary(
+			ternary(
 				0 < limit,
 				AudioManager.InstancePolicy.Constant,
 				AudioManager.InstancePolicy.Immediate
@@ -323,7 +323,7 @@ local function load_kind(id, root_path, kind_name, desc_table, asset_table)
 	end
 	if kind.loader then
 		for name, desc in pairs(desc_table) do
-			Util.tcheck(desc, "table")
+			tcheck(desc, "table")
 			local asset = kind.loader(root_path, name, desc)
 			if "table" == type(asset) then
 				asset.__id = id
@@ -338,9 +338,9 @@ local function load_kind(id, root_path, kind_name, desc_table, asset_table)
 end
 
 function M.load(root_path, desc_root, asset_table)
-	Util.tcheck(root_path, "string")
-	Util.tcheck(desc_root, "table")
-	Util.tcheck(asset_table, "table")
+	tcheck(root_path, "string")
+	tcheck(desc_root, "table")
+	tcheck(asset_table, "table")
 
 	local id = 1
 	for _, kind_name in pairs(LoadOrder) do

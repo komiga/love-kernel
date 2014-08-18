@@ -118,10 +118,10 @@ end
 
 -- class BindGroup
 
-M.BindGroup = Util.class(M.BindGroup)
+M.BindGroup = class(M.BindGroup)
 
 function M.BindGroup:__init(bind_table)
-	Util.tcheck(bind_table, "table")
+	tcheck(bind_table, "table")
 
 	self.bind_table = {}
 	self:add(bind_table)
@@ -136,12 +136,12 @@ function M.BindGroup:get_bind(ident)
 end
 
 function M.BindGroup:add(bind_table)
-	Util.tcheck(bind_table, "table")
+	tcheck(bind_table, "table")
 
 	local check = {}
 	local expanded = {}
 	for ident, bind in pairs(bind_table) do
-		Util.tcheck(bind, "table")
+		tcheck(bind, "table")
 		bind.ident = ident
 		if "table" == type(ident) then
 			for _, sub_ident in pairs(ident) do
@@ -159,19 +159,19 @@ end
 -- Bind interface
 
 function M.tcheck(group, opt)
-	opt = Util.optional(opt, false)
-	Util.tcheck(group, "table", opt)
+	opt = optional(opt, false)
+	tcheck(group, "table", opt)
 	assert((not group and opt) or M.BindGroup == group.__index)
 end
 
 function M.new_group(bind_table)
-	return Util.new_object(M.BindGroup, bind_table)
+	return new_object(M.BindGroup, bind_table)
 end
 
 function M.init(global_group, gate_fn, enable_mouse)
-	Util.tcheck(global_group, "table")
-	Util.tcheck(gate_fn, "function")
-	Util.tcheck(enable_mouse, "boolean", true)
+	tcheck(global_group, "table")
+	tcheck(gate_fn, "function")
+	tcheck(enable_mouse, "boolean", true)
 
 	assert(not M.data.__initialized)
 
@@ -179,7 +179,7 @@ function M.init(global_group, gate_fn, enable_mouse)
 	M.data.gate_fn = gate_fn
 	M.data.stack = {}
 	M.data.active = {}
-	M.data.mouse_enabled = Util.optional(enable_mouse, true)
+	M.data.mouse_enabled = optional(enable_mouse, true)
 
 	M.data.__initialized = true
 end
@@ -207,7 +207,7 @@ function M.pop_group(group)
 end
 
 function M.active_group()
-	return Util.ternary(
+	return ternary(
 		0 < Bind.count(),
 		M.data.stack[Bind.count()],
 		M.data.global_group
