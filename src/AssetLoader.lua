@@ -193,7 +193,7 @@ Once loaded, a frame quad is accessed by index:
 
 Each frame is a Quad.
 
-See Animator/AnimInstance.
+See Animator.Instance.
 
 ]]
 Kind.anim = {
@@ -272,7 +272,7 @@ With path, instance policy, and instance limit:
 The second parameter is the instance policy. This is defaulted to
 Constant if limit > 0, or Immediate if limit <= 0.
 
-See AudioManager/SoundInstance.
+See AudioManager.SoundInstance.
 
 --]]
 Kind.sound = {
