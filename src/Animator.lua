@@ -69,7 +69,7 @@ function AnimInstance:update(dt)
 	if self.playing then
 		self.accum = self.accum + dt
 		if self.data.duration <= self.accum then
-			local amt = math.floor(self.accum/self.data.duration)
+			local amt = math.floor(self.accum / self.data.duration)
 			local new_frame = self.frame + amt
 			if new_frame > #self.set then
 				if Mode.Loop == self.mode then
@@ -92,7 +92,7 @@ function AnimInstance:update(dt)
 end
 
 function AnimInstance:render(x,y, r, sx,sy, ox,oy)
-	Gfx.drawq(
+	Gfx.draw(
 		self.data.tex, self.set[self.frame],
 		x,y, r, sx,sy, ox,oy
 	)
@@ -138,7 +138,7 @@ end
 function AnimBatcher:add(inst, x,y, r, sx,sy, ox,oy)
 	local batch_id = self.active[inst]
 	if nil ~= batch_id then
-		self.batch:setq(
+		self.batch:set(
 			batch_id,
 			inst.set[inst.frame],
 			x,y, r, sx,sy, ox,oy
@@ -147,7 +147,7 @@ function AnimBatcher:add(inst, x,y, r, sx,sy, ox,oy)
 		if self.limit <= #self.active then
 			Util.debug("AnimBatcher: batch full")
 		else
-			local batch_id = self.batch:addq(
+			local batch_id = self.batch:add(
 				inst.set[inst.frame],
 				x,y, r, sx,sy, ox,oy
 			)

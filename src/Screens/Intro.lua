@@ -212,7 +212,7 @@ function Impl:render()
 	if not self:is_seq_finished() then
 		local quad = self.atlas[self:current_seq().name]
 		local _, _, w, h = quad:getViewport()
-		Gfx.drawq(
+		Gfx.draw(
 			self.atlas.__tex,
 			quad,
 			Core.display_width_half - (w / 2),

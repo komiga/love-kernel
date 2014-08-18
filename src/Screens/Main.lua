@@ -171,8 +171,8 @@ function Impl:render()
 	a = Asset.atlas.sprites
 	t = a.__tex
 	Gfx.draw(t, 128,128)
-	Gfx.drawq(t, a.a, 160,192)
-	Gfx.drawq(t, a.b, 128,160)
+	Gfx.draw(t, a.a, 160,192)
+	Gfx.draw(t, a.b, 128,160)
 
 	a = self.moving_square
 	b = self.batcher

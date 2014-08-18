@@ -16,12 +16,13 @@ function love.load(argv)
 	Core.init(argv)
 end
 
-function love.update(elapsed)
-	Core.update(elapsed)
+function love.update(dt)
+	Core.update(dt)
 end
 
 function love.draw()
 	Gfx.clear()
+	Gfx.origin()
 	Core.render()
 	Gfx.present()
 end
@@ -45,7 +46,7 @@ function love.run()
 
 	local base_time = Timer.getTime()
 	local sim_time = 0
-    local frame_hertz = 1.0 / 60.0
+    local frame_time = 1.0 / 60.0
 
 	while true do
 		local update_screen = false
@@ -68,8 +69,8 @@ function love.run()
 			end
 			Event.clear()
 
-			love.update(frame_hertz)
-			sim_time = current_time + frame_hertz
+			love.update(frame_time)
+			sim_time = current_time + frame_time
 		end
 
 		if update_screen then
