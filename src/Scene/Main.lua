@@ -210,7 +210,7 @@ local function __static_init()
 	)
 
 	if not M.data.bind_group then
-		M.data.bind_group = Bind.new_group(M.data.bind_table)
+		M.data.bind_group = Bind.Group(M.data.bind_table)
 	end
 	Hooker.init(Asset.hooklets, Asset.font.main)
 end

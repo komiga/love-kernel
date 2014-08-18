@@ -116,26 +116,26 @@ local function bind_release(ident)
 	end
 end
 
--- class BindGroup
+-- class Group
 
-M.BindGroup = class(M.BindGroup)
+M.Group = class(M.Group)
 
-function M.BindGroup:__init(bind_table)
+function M.Group:__init(bind_table)
 	type_assert(bind_table, "table")
 
 	self.bind_table = {}
 	self:add(bind_table)
 end
 
-function M.BindGroup:has_ident(ident)
+function M.Group:has_ident(ident)
 	return nil ~= self.bind_table[ident]
 end
 
-function M.BindGroup:get_bind(ident)
+function M.Group:get_bind(ident)
 	return self.bind_table[ident]
 end
 
-function M.BindGroup:add(bind_table)
+function M.Group:add(bind_table)
 	type_assert(bind_table, "table")
 
 	local check = {}
@@ -158,16 +158,6 @@ end
 
 -- Bind interface
 
-function M.type_assert(group, opt)
-	opt = optional(opt, false)
-	type_assert(group, "table", opt)
-	assert((not group and opt) or M.BindGroup == group.__index)
-end
-
-function M.new_group(bind_table)
-	return new_object(M.BindGroup, bind_table)
-end
-
 function M.init(global_group, gate_fn, enable_mouse)
 	type_assert(global_group, "table")
 	type_assert(gate_fn, "function")
@@ -175,7 +165,7 @@ function M.init(global_group, gate_fn, enable_mouse)
 
 	assert(not M.data.__initialized)
 
-	M.data.global_group = Bind.new_group(global_group)
+	M.data.global_group = Bind.Group(global_group)
 	M.data.gate_fn = gate_fn
 	M.data.stack = {}
 	M.data.active = {}
@@ -193,14 +183,14 @@ function M.set_gate(gate_fn)
 end
 
 function M.push_group(group)
-	Bind.type_assert(group)
+	type_assert(group, Bind.Group)
 
 	table.insert(M.data.stack, group)
 end
 
 function M.pop_group(group)
 	assert(0 < Bind.count())
-	Bind.type_assert(group)
+	type_assert(group, Bind.Group)
 
 	assert(group == M.data.stack[Bind.count()])
 	table.remove(M.data.stack)

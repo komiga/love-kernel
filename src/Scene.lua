@@ -21,7 +21,7 @@ function M.Unit:__init(impl, bind_group, transparent)
 	type_assert(impl.update, "function")
 	type_assert(impl.render, "function")
 	type_assert(impl.bind_gate, "function", true)
-	Bind.type_assert(bind_group, true)
+	type_assert(bind_group, Bind.Group, true)
 	type_assert(transparent, "boolean", true)
 
 	self.impl = impl
