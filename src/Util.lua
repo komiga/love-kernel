@@ -51,17 +51,36 @@ function table.last(table)
 	return table[#table]
 end
 
+local function get_trace()
+	local info = debug.getinfo(3, "Sl")
+	local function pad(str, length)
+		if #str < length then
+			while #str < length do
+				str = ' ' .. str
+			end
+		end
+		return str
+	end
+	return info.short_src .. " @ " .. pad(tostring(info.currentline), 4)
+end
+
+function log(...)
+	print(...)
+end
+
+function log_traced(msg, ...)
+	log(get_trace() .. ": " .. msg, ...)
+end
+
 function log_debug_sys(sys, msg, ...)
 	if true == sys then
-		local info = debug.getinfo(2, "Sl")
-		print(info.short_src .. " @ " .. info.currentline .. ": debug: " .. msg, ...)
+		log(get_trace() .. ": debug: " .. msg, ...)
 	end
 end
 
 function log_debug(msg, ...)
 	if true == State.gen_debug then
-		local info = debug.getinfo(2, "Sl")
-		print(info.short_src .. " @ " .. info.currentline .. ": debug: " .. msg, ...)
+		log(get_trace() .. ": debug: " .. msg, ...)
 	end
 end
 

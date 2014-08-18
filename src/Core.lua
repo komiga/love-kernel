@@ -58,9 +58,9 @@ function M.init(args)
 			handler = function(_, _, _, _)
 				State.gen_debug = not State.gen_debug
 				if State.gen_debug then
-					print("debug mode enabled")
+					log("debug mode enabled")
 				else
-					print("debug mode disabled")
+					log("debug mode disabled")
 				end
 			end
 		}
@@ -70,9 +70,9 @@ function M.init(args)
 			handler = function(_, _, _, _)
 				State.gfx_debug = not State.gfx_debug
 				if State.gfx_debug then
-					print("graphics debug mode enabled")
+					log("graphics debug mode enabled")
 				else
-					print("graphics debug mode disabled")
+					log("graphics debug mode disabled")
 				end
 			end
 		}
@@ -82,9 +82,9 @@ function M.init(args)
 			handler = function(_, _, _, _)
 				State.sfx_debug = not State.sfx_debug
 				if State.sfx_debug then
-					print("sound debug mode enabled")
+					log("sound debug mode enabled")
 				else
-					print("sound debug mode disabled")
+					log("sound debug mode disabled")
 				end
 			end
 		}
@@ -94,9 +94,9 @@ function M.init(args)
 			handler = function(_, _, _, _)
 				State.gfx_debug_cross = not State.gfx_debug_cross
 				if State.gfx_debug_cross then
-					print("graphics crosshair debug mode enabled")
+					log("graphics crosshair debug mode enabled")
 				else
-					print("graphics crosshair debug mode disabled")
+					log("graphics crosshair debug mode disabled")
 				end
 			end
 		}
