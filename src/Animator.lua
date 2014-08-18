@@ -161,15 +161,15 @@ end
 
 -- Animator interface
 
-local data = {
+M.data = M.data or {
 	__initialized = false
 }
 
 function M.init(anim_table)
 	Util.tcheck(anim_table, "table")
-	assert(not data.__initialized)
+	assert(not M.data.__initialized)
 
-	data.__initialized = true
+	M.data.__initialized = true
 end
 
 function M.batcher(ad, limit, mode)
