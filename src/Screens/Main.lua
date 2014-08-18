@@ -14,7 +14,7 @@ require("src/Animator")
 require("src/AssetLoader")
 require("src/Asset")
 
-local data = {
+M.data = M.data or {
 	__initialized = false,
 
 	bind_table = nil,
@@ -23,7 +23,7 @@ local data = {
 	instance = nil
 }
 
-data.bind_table = {
+M.data.bind_table = {
 	["escape"] = {
 		on_release = true,
 		passthrough = false,
@@ -76,7 +76,7 @@ data.bind_table = {
 	["i"] = {
 		on_release = true,
 		handler = function(_, _, _, _)
-			data.impl:push_intro()
+			M.data.impl:push_intro()
 		end
 	}
 }
@@ -208,8 +208,8 @@ local function __static_init()
 		400.0, 400.0
 	)
 
-	if not data.bind_group then
-		data.bind_group = Bind.new_group(data.bind_table)
+	if not M.data.bind_group then
+		M.data.bind_group = Bind.new_group(M.data.bind_table)
 	end
 	Hooker.init(Asset.hooklets, Asset.font.main)
 end
@@ -218,25 +218,25 @@ local function new(transparent)
 	__static_init()
 
 	local impl = Util.new_object(M.Impl)
-	return Screen.new(impl, data.bind_group, transparent)
+	return Screen.new(impl, M.data.bind_group, transparent)
 end
 
 function M.init(_)
-	assert(not data.__initialized)
-	data.instance = new(false)
-	data.impl = data.instance.impl
+	assert(not M.data.__initialized)
+	M.data.instance = new(false)
+	M.data.impl = M.data.instance.impl
 	Core.set_focus_fn(focus_changed)
-	data.__initialized = true
+	M.data.__initialized = true
 
-	return data.instance
+	return M.data.instance
 end
 
 function M.get_instance()
-	return data.instance
+	return M.data.instance
 end
 
 function M.focus_changed(focused)
 	if not State.pause_lock then
-		data.impl:pause(not focused)
+		M.data.impl:pause(not focused)
 	end
 end
