@@ -13,11 +13,23 @@ HID = {
 require("src/State")
 require("src/Core")
 
-function love.load(argv)
-	if State.auto_reload then
-		lurker = require("dep/lurker/lurker")
-		lurker.interval = 1.0
+local lurker = nil
+
+local function module_reload(path)
+	local modname = lurker.modname(path)
+	local module = require(modname)
+	if "table" == type(module) and module.module_reload then
+		module.module_reload()
 	end
+end
+
+if State.auto_reload then
+	lurker = require("dep/lurker/lurker")
+	lurker.interval = 1.0
+	lurker.postswap = module_reload
+end
+
+function love.load(argv)
 	Core.init(argv)
 end
 
