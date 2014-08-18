@@ -12,15 +12,15 @@ require("src/AssetLoader")
 require("src/Asset")
 require("src/Timer")
 
-local data = {
+M.data = M.data or {
 	trans_in = nil,
 	trans_out = nil
 }
 
-data.trans_in = {
+M.data.trans_in = {
 	["alpha"] = {{0, 255}}
 }
-data.trans_out = {
+M.data.trans_out = {
 	["alpha"] = {{255, 0}}
 }
 
@@ -49,21 +49,21 @@ function M.Impl:__init(seq, atlas, soft)
 	self.fmode_in.animator = FieldAnimator.new(
 		0.0,
 		self.fmode_in,
-		data.trans_in,
+		M.data.trans_in,
 		FieldAnimator.Mode.Stop
 	)
 	self.fmode_out = {}
 	self.fmode_out.animator = FieldAnimator.new(
 		0.0,
 		self.fmode_out,
-		data.trans_out,
+		M.data.trans_out,
 		FieldAnimator.Mode.Stop
 	)
 	self.fmode_out_bg = {}
 	self.fmode_out_bg.animator = FieldAnimator.new(
 		0.0,
 		self.fmode_out_bg,
-		data.trans_out,
+		M.data.trans_out,
 		FieldAnimator.Mode.Stop
 	)
 	self.stay_timer = Timer.new()
