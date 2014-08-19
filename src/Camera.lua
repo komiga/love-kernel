@@ -1,15 +1,12 @@
 
-Camera = Camera or {}
-local M = Camera
-
 require("src/Util")
 require("src/AudioManager")
 
-M.data = M.data or {
+local M = def_module("Camera", {
 	__love_translate = Gfx.translate,
 	__initialized = false,
 	cam = nil
-}
+})
 
 M.data.__camera_translate = function(x, y)
 	M.data.__love_translate(

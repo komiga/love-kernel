@@ -1,10 +1,9 @@
 
-Asset = Asset or {}
-local M = Asset
-
 require("src/AudioManager")
 require("src/FieldAnimator")
 require("src/Hooker")
+
+local M = def_module("Asset", nil)
 
 local InstancePolicy = AudioManager.InstancePolicy
 

@@ -1,8 +1,7 @@
 
-FieldAnimator = FieldAnimator or {}
-local M = FieldAnimator
-
 require("src/Util")
+
+local M = def_module("FieldAnimator", nil)
 
 FieldAnimator.Mode = {
 	Stop = 1,

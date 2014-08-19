@@ -1,7 +1,4 @@
 
-STUBScene = STUBScene or {}
-local M = STUBScene
-
 require("src/State")
 require("src/Util")
 require("src/Bind")
@@ -13,7 +10,7 @@ require("src/Animator")
 require("src/AssetLoader")
 require("src/Asset")
 
-M.data = M.data or {
+local M = def_module("STUBScene", {
 	bind_table = nil,
 	bind_group = nil,
 
@@ -23,7 +20,7 @@ M.data = M.data or {
 	instance = nil,
 	impl = nil
 	--]]
-}
+})
 
 M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
 	["mouse1"] = {

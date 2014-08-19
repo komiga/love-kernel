@@ -1,7 +1,4 @@
 
-MainScene = MainScene or {}
-local M = MainScene
-
 require("src/State")
 require("src/Util")
 require("src/Bind")
@@ -15,14 +12,14 @@ require("src/Asset")
 
 require("src/Scene/Intro")
 
-M.data = M.data or {
+local M = def_module("MainScene", {
 	__initialized = false,
 
 	bind_table = nil,
 	bind_group = nil,
 	impl = nil,
 	instance = nil
-}
+})
 
 M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
 	["escape"] = {

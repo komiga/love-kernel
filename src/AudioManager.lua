@@ -1,6 +1,11 @@
 
-AudioManager = AudioManager or {}
-local M = AudioManager
+require("src/Util")
+
+local M = def_module("AudioManager", {
+	__initialized = false,
+	paused = nil,
+	buckets = nil
+})
 
 M.InstancePolicy = {
 	-- Kill immediately, regardless of limit; grow past limit
@@ -135,12 +140,6 @@ function M.Bucket:update(dt)
 end
 
 -- AudioManager interface
-
-M.data = M.data or {
-	__initialized = false,
-	paused = nil,
-	buckets = nil
-}
 
 function M.init(sound_table)
 	type_assert(sound_table, "table")

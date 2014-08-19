@@ -1,14 +1,11 @@
 
-Scene = Scene or {}
-local M = Scene
-
 require("src/Util")
 require("src/Bind")
 
-M.data = M.data or {
+local M = def_module("Scene", {
 	__initialized = false,
 	stack = nil
-}
+})
 
 -- class Scene
 

@@ -1,10 +1,10 @@
 
-Util = Util or {}
-local M = Util
-
 require("src/State")
 
 --local M_lrandom = require("random")
+
+Util = Util or {}
+local M = Util
 
 --[[M.data = M.data or {
 	rng = nil
@@ -115,6 +115,34 @@ function class(c)
 		setmetatable(c, c.__class_static)
 	end
 	return c
+end
+
+function def_module(name, data)
+	type_assert(name, "string")
+	type_assert(data, "table", true)
+
+	local m = _G[name] or {}
+	if not m.data and data then
+		m.data = data
+	end
+	_G[name] = m
+	return m
+end
+
+function def_module_unit(name, data)
+	local m = def_module(name, data)
+	if not m.__class_static then
+		m.__class_static = {}
+		m.__class_static.__index = m.__class_static
+		m.__class_static.__call = function(m, ...)
+			local obj = {}
+			setmetatable(obj, m.Unit)
+			obj:__init(...)
+			return obj
+		end
+		setmetatable(m, m.__class_static)
+	end
+	return m
 end
 
 function new_object(c, ...)

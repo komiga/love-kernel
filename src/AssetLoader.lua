@@ -1,10 +1,9 @@
 
-AssetLoader = AssetLoader or {}
-local M = AssetLoader
-
 require("src/Util")
 require("src/AudioManager")
 require("src/Animator")
+
+local M = def_module("AssetLoader", nil)
 
 local Kind = {}
 

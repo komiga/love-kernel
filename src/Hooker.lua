@@ -1,9 +1,11 @@
 
-Hooker = Hooker or {}
-local M = Hooker
-
 require("src/Util")
 require("src/FieldAnimator")
+
+local M = def_module("Hooker", {
+	__initialized = false,
+	active = nil
+})
 
 -- class Hooklet
 
@@ -49,11 +51,6 @@ function M.Hooklet:render()
 end
 
 -- Hooker interface
-
-M.data = M.data or {
-	__initialized = false,
-	active = nil
-}
 
 function M.init(hooklet_props, default_font)
 	type_assert(hooklet_props, "table")

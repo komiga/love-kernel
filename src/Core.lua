@@ -1,7 +1,4 @@
 
-Core = Core or {}
-local M = Core
-
 require("src/State")
 require("src/Util")
 require("src/Bind")
@@ -12,10 +9,10 @@ require("src/AssetLoader")
 
 require("src/Scene/Main")
 
-M.data = M.data or {
+local M = def_module("Core", {
 	bind_table = nil,
 	focus_fn = nil
-}
+})
 
 M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
 -- System

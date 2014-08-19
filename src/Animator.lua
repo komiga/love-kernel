@@ -1,8 +1,9 @@
 
-Animator = Animator or {}
-local M = Animator
-
 require("src/Util")
+
+local M = def_module("Animator", {
+	__initialized = false
+})
 
 M.Mode = {
 	Stop = 1,
@@ -167,10 +168,6 @@ function M.Batcher:render()
 end
 
 -- Animator interface
-
-M.data = M.data or {
-	__initialized = false
-}
 
 function M.init(anim_table)
 	type_assert(anim_table, "table")

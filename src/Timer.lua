@@ -1,8 +1,7 @@
 
-Timer = Timer or {}
-local M = Timer
-
 require("src/Util")
+
+local M = def_module("Timer", nil)
 
 -- class Timer
 

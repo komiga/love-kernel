@@ -1,8 +1,16 @@
 
-Bind = Bind or {}
-local M = Bind
-
 require("src/Util")
+
+local M = def_module("Bind", {
+	__initialized = false,
+
+	global_group = nil,
+	gate_fn = nil,
+	stack = nil,
+	active = nil,
+	modifiers = nil,
+	mouse_enabled = nil
+})
 
 M.Kind = {
 	Press = 1,
@@ -56,16 +64,6 @@ local Modifier = {
 	["lmeta"] = true,
 	["lsuper"] = true,
 	["rsuper"] = true,
-}
-
-M.data = M.data or {
-	__initialized = false,
-	global_group = nil,
-	gate_fn = nil,
-	stack = nil,
-	active = nil,
-	modifiers = nil,
-	mouse_enabled = nil
 }
 
 -- internal

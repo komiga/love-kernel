@@ -1,7 +1,4 @@
 
-IntroScene = IntroScene or {}
-local M = IntroScene
-
 require("src/State")
 require("src/Util")
 require("src/Bind")
@@ -12,10 +9,10 @@ require("src/AssetLoader")
 require("src/Asset")
 require("src/Timer")
 
-M.data = M.data or {
+local M = def_module("IntroScene", {
 	trans_in = nil,
 	trans_out = nil
-}
+})
 
 M.data.trans_in = {
 	["alpha"] = {{0, 255}}
