@@ -1,0 +1,154 @@
+
+require("src/Util")
+
+local M = def_module("Math", nil)
+
+-- class Vec2
+
+Vec2 = class(Vec2)
+
+function Vec2:__init(x, y)
+	if is_type(x, Vec2)
+		type_assert(y, "nil")
+		self:set(x)
+	else
+		self:set(x or 0, y or 0)
+	end
+end
+
+function Vec2:set(x, y)
+	if is_type(x, Vec2)
+		type_assert(y, "nil")
+		self.x = y.x
+		self.y = y.y
+	else
+		type_assert(x, "number")
+		type_assert(y, "number")
+		self.x = x
+		self.y = y
+	end
+end
+
+function Vec2:get()
+	return self.x, self.y
+end
+
+function Vec2.__len(_)
+	return 2
+end
+
+function Vec2.__tostring(l)
+	return "(" .. l.x .. ", " .. l.y .. ")"
+end
+
+function Vec2.__eq(l, r)
+	return l.x == r.x and l.y == r.y
+end
+
+function Vec2.__lt(l, r)
+	return l.x < r.x and l.y < r.y
+end
+
+function Vec2.__le(l, r)
+	return l.x <= r.x and l.y <= r.y
+end
+
+function Vec2.__unm(l)
+	return Vec2(-l.x, -l.y)
+end
+
+function Vec2.__add(l, r)
+	if is_type(x, Vec2) then
+		return Vec2(l.x + r.x, l.y + r.y)
+	else
+		type_assert(x, "number")
+		return Vec2(l.x + r, l.y + r)
+	end
+end
+
+function Vec2.__sub(l, r)
+	if is_type(x, Vec2) then
+		return Vec2(l.x - r.x, l.y - r.y)
+	else
+		type_assert(x, "number")
+		return Vec2(l.x - r, l.y - r)
+	end
+end
+
+function Vec2.__mul(l, r)
+	if is_type(x, Vec2) then
+		return Vec2(l.x * r.x, l.y * r.y)
+	else
+		type_assert(x, "number")
+		return Vec2(l.x * r, l.y * r)
+	end
+end
+
+function Vec2.__div(l, r)
+	if is_type(x, Vec2) then
+		return Vec2(l.x / r.x, l.y / r.y)
+	else
+		type_assert(x, "number")
+		return Vec2(l.x / r, l.y / r)
+	end
+end
+
+function Vec2:dot(v)
+	type_assert(v, Vec2)
+	return self.x * v.x + self.y * v.y
+end
+
+function Vec2:length()
+	return math.sqrt(self.x * self.x + self.y * self.y)
+end
+
+function Vec2:length2()
+	return self.x * self.x + self.y * self.y
+end
+
+function Vec2:distance(v)
+	type_assert(v, Vec2)
+	local dx = v.x - self.x
+	local dy = v.y - self.y
+	return math.sqrt(dx * dx + dy * dy)
+end
+
+function Vec2:distance2(v)
+	type_assert(v, Vec2)
+	local dx = v.x - self.x
+	local dy = v.y - self.y
+	return dx * dx + dy * dy
+end
+
+function Vec2:normalize()
+	local linverse = 1 / math.sqrt(self.x * self.x + self.y * self.y)
+	self.x = self.x * linverse
+	self.y = self.y * linverse
+end
+
+function Vec2:normalized()
+	return Vec2(self):normalize()
+end
+
+function Vec2:rotate(theta)
+	type_assert(theta, "number")
+	local theta_sin = math.sin(theta)
+	local theta_cos = math.cos(theta)
+	self.x = self.x * theta_cos - self.y * theta_sin
+	self.y = self.x * theta_sin + self.y * theta_cos
+end
+
+function Vec2:rotated(theta)
+	return Vec2(self):rotate(theta)
+end
+
+function Vec2:perpendicular()
+	return Vec2(-self.y, self.x)
+end
+
+function Vec2:angle_to(v)
+	type_assert(v, Vec2)
+	return math.atan2(self.y, self.x) - math.atan2(v.x, v.y)
+end
+
+return M
