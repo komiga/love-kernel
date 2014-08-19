@@ -124,6 +124,7 @@ function Vec2:normalize()
 	local linverse = 1 / math.sqrt(self.x * self.x + self.y * self.y)
 	self.x = self.x * linverse
 	self.y = self.y * linverse
+	return self
 end
 
 function Vec2:normalized()
@@ -136,6 +137,7 @@ function Vec2:rotate(theta)
 	local theta_cos = math.cos(theta)
 	self.x = self.x * theta_cos - self.y * theta_sin
 	self.y = self.x * theta_sin + self.y * theta_cos
+	return self
 end
 
 function Vec2:rotated(theta)
