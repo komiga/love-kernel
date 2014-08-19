@@ -99,20 +99,25 @@ function choose_random(table)
 	return table[random(1, #table)]
 end
 
+function set_functable(t, func)
+	if not t.__class_static then
+		t.__class_static = {}
+		t.__class_static.__index = t.__class_static
+		setmetatable(t, t.__class_static)
+	end
+	t.__class_static.__call = func
+end
+
 function class(c)
 	if nil == c then
 		c = {}
 		c.__index = c
-
-		c.__class_static = {}
-		c.__class_static.__index = c.__class_static
-		c.__class_static.__call = function(c, ...)
+		set_functable(c, function(c, ...)
 			local obj = {}
 			setmetatable(obj, c)
 			obj:__init(...)
 			return obj
-		end
-		setmetatable(c, c.__class_static)
+		end)
 	end
 	return c
 end
@@ -131,17 +136,12 @@ end
 
 function def_module_unit(name, data)
 	local m = def_module(name, data)
-	if not m.__class_static then
-		m.__class_static = {}
-		m.__class_static.__index = m.__class_static
-		m.__class_static.__call = function(m, ...)
-			local obj = {}
-			setmetatable(obj, m.Unit)
-			obj:__init(...)
-			return obj
-		end
-		setmetatable(m, m.__class_static)
-	end
+	set_functable(m, function(m, ...)
+		local obj = {}
+		setmetatable(obj, m.Unit)
+		obj:__init(...)
+		return obj
+	end)
 	return m
 end
 
