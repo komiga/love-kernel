@@ -1,4 +1,5 @@
 
+require("src/Util")
 require("src/AudioManager")
 require("src/FieldAnimator")
 require("src/Hooker")
