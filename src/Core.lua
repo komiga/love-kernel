@@ -1,6 +1,7 @@
 
 require("src/State")
 require("src/Util")
+require("src/Math")
 require("src/Bind")
 require("src/Scene")
 require("src/AudioManager")
@@ -43,10 +44,12 @@ function M.init(args)
 		State.gen_debug = true
 	end
 
-	Core.display_width = Gfx.getWidth()
-	Core.display_width_half = 0.5 * Core.display_width
-	Core.display_height = Gfx.getHeight()
-	Core.display_height_half = 0.5 * Core.display_height
+	Core.display_size = Vec2(Gfx.getWidth(), Gfx.getHeight())
+	Core.display_size_half = Core.display_size * 0.5
+	Core.display_width = Core.display_size.x
+	Core.display_width_half = Core.display_size_half.x
+	Core.display_height = Core.display_size.y
+	Core.display_height_half = Core.display_size_half.y
 
 	if not debug_mode_temp then
 		M.data.bind_table["f1"] = {
