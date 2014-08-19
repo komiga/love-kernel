@@ -145,14 +145,6 @@ function def_module_unit(name, data)
 	return m
 end
 
-function new_object(c, ...)
-	local obj = {}
-	setmetatable(obj, c)
-
-	obj:__init(...)
-	return obj
-end
-
 -- takes:
 --	(rgba, alpha_opt),
 --	(rgb, alpha), or

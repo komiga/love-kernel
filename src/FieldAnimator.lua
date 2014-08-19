@@ -1,7 +1,7 @@
 
 require("src/Util")
 
-local M = def_module("FieldAnimator", nil)
+local M = def_module_unit("FieldAnimator", nil)
 
 FieldAnimator.Mode = {
 	Stop = 1,
@@ -111,12 +111,6 @@ function M.Unit:update(dt)
 		end
 	end
 	return self:is_complete()
-end
-
--- FieldAnimator interface
-
-function M.new(duration, fields, trans, mode, serial_reset_callback)
-	return new_object(M.Unit, duration, fields, trans, mode, serial_reset_callback)
 end
 
 return M

@@ -22,10 +22,6 @@ M.InstancePolicy = {
 
 M.SoundInstance = class(M.SoundInstance)
 
-function M.SoundInstance.new(sound_data, x, y, z)
-	return new_object(M.SoundInstance, sound_data, x, y, z)
-end
-
 function M.SoundInstance:__init(sound_data, x, y, z)
 	self.source = Sfx.newSource(sound_data.data, "static")
 	self:set_position(x, y, z)
@@ -59,10 +55,6 @@ end
 
 M.Bucket = class(M.Bucket)
 
-function M.Bucket.new(sound_data)
-	return new_object(M.Bucket, sound_data)
-end
-
 function M.Bucket:__init(sound_data)
 	type_assert(sound_data, "table")
 	type_assert_obj(sound_data.data, "SoundData")
@@ -75,7 +67,7 @@ function M.Bucket:__init(sound_data)
 		for i = 1, self.data.limit do
 			table.insert(
 				self.free,
-				M.SoundInstance.new(sound_data, 0.0, 0.0, 0.0)
+				M.SoundInstance(sound_data, 0.0, 0.0, 0.0)
 			)
 		end
 		self.count = self.data.limit
@@ -95,7 +87,7 @@ function M.Bucket:spawn(x, y, z)
 		table.remove(self.free)
 	else
 		if self:can_grow() then
-			inst = M.SoundInstance.new(self.data, x, y, z)
+			inst = M.SoundInstance(self.data, x, y, z)
 			self.count = self.count + 1
 		elseif
 			M.InstancePolicy.Trample == self.policy
@@ -150,7 +142,7 @@ function M.init(sound_table)
 	M.data.__initialized = true
 
 	for _, sd in pairs(sound_table) do
-		M.data.buckets[sd.__id] = M.Bucket.new(sd)
+		M.data.buckets[sd.__id] = M.Bucket(sd)
 	end
 end
 

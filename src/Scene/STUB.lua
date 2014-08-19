@@ -79,26 +79,28 @@ end
 
 -- STUBScene interface
 
-local function __static_init()
-	if not M.data.bind_group then
-		M.data.bind_group = Bind.Group(M.data.bind_table)
+-- Instantiable
+
+set_functable(M,
+	function(_, transparent)
+		if not M.data.bind_group then
+			M.data.bind_group = Bind.Group(M.data.bind_table)
+		end
+
+		return Scene(M.Impl(), M.data.bind_group, transparent)
 	end
-end
-
--- Make local if singleton
---[[local--]] function M.new(transparent)
-	__static_init()
-
-	local impl = new_object(M.Impl)
-	return Scene.new(impl, M.data.bind_group, transparent)
-end
+)
 
 -- Singleton
 --[[
 
 function M.init(_)
 	assert(not M.data.__initialized)
-	M.data.instance = M.new(false)
+	if not M.data.bind_group then
+		M.data.bind_group = Bind.Group(M.data.bind_table)
+	end
+
+	M.data.instance = Scene(M.Impl(), M.data.bind_group, false)
 	M.data.impl = M.data.instance.impl
 	M.data.__initialized = true
 

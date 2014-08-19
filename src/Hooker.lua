@@ -20,7 +20,7 @@ function M.Hooklet:__init(props, x, y)
 	self.x = x
 	self.y = y
 	self.fields = {}
-	self.animator = FieldAnimator.new(
+	self.animator = FieldAnimator(
 		self.props.duration,
 		self.fields,
 		self.props.trans,
@@ -100,7 +100,7 @@ function M.clear_specific(props)
 end
 
 function M.spawn(props, x, y)
-	local hkl = new_object(M.Hooklet, props, x, y)
+	local hkl = M.Hooklet(props, x, y)
 	table.insert(M.data.active, hkl)
 end
 

@@ -2,7 +2,7 @@
 require("src/Util")
 require("src/Bind")
 
-local M = def_module("Scene", {
+local M = def_module_unit("Scene", {
 	__initialized = false,
 	stack = nil
 })
@@ -75,10 +75,6 @@ function M.Unit:render()
 end
 
 -- Scene interface
-
-function M.new(impl, bind_group, transparent)
-	return new_object(M.Unit, impl, bind_group, transparent)
-end
 
 function M.init()
 	assert(not M.data.__initialized)

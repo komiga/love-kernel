@@ -124,7 +124,7 @@ function M.Impl:__init()
 end
 
 function M.Impl:push_intro()
-	Scene.push(IntroScene.new(
+	Scene.push(IntroScene(
 		Asset.intro_seq,
 		Asset.atlas.intro_seq,
 		false,
@@ -217,28 +217,15 @@ end
 
 -- MainScene interface
 
-local function __static_init()
-	Camera.init(
-		Core.display_width_half, Core.display_height_half,
-		400.0
-	)
-
+function M.init(_)
+	assert(not M.data.__initialized)
 	if not M.data.bind_group then
 		M.data.bind_group = Bind.Group(M.data.bind_table)
 	end
+	Camera.init(Core.display_width_half, Core.display_height_half, 400.0)
 	Hooker.init(Asset.hooklets, Asset.font.main)
-end
 
-local function new(transparent)
-	__static_init()
-
-	local impl = new_object(M.Impl)
-	return Scene.new(impl, M.data.bind_group, transparent)
-end
-
-function M.init(_)
-	assert(not M.data.__initialized)
-	M.data.instance = new(false)
+	M.data.instance = Scene(M.Impl(), M.data.bind_group, false)
 	M.data.impl = M.data.instance.impl
 	Core.set_focus_fn(focus_changed)
 	M.data.__initialized = true

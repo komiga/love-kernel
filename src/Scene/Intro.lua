@@ -43,27 +43,27 @@ function M.Impl:__init(seq, atlas, soft)
 	type_assert(soft, "boolean", false)
 
 	self.fmode_in = {}
-	self.fmode_in.animator = FieldAnimator.new(
+	self.fmode_in.animator = FieldAnimator(
 		0.0,
 		self.fmode_in,
 		M.data.trans_in,
 		FieldAnimator.Mode.Stop
 	)
 	self.fmode_out = {}
-	self.fmode_out.animator = FieldAnimator.new(
+	self.fmode_out.animator = FieldAnimator(
 		0.0,
 		self.fmode_out,
 		M.data.trans_out,
 		FieldAnimator.Mode.Stop
 	)
 	self.fmode_out_bg = {}
-	self.fmode_out_bg.animator = FieldAnimator.new(
+	self.fmode_out_bg.animator = FieldAnimator(
 		0.0,
 		self.fmode_out_bg,
 		M.data.trans_out,
 		FieldAnimator.Mode.Stop
 	)
-	self.stay_timer = Timer.new()
+	self.stay_timer = Timer()
 
 	self.sequences = seq
 	self.atlas = atlas
@@ -220,11 +220,13 @@ end
 local function __static_init()
 end
 
-function M.new(seq, atlas, soft, transparent)
-	__static_init()
+set_functable(M,
+	function(_, seq, atlas, soft, transparent)
+		__static_init()
 
-	local impl = new_object(M.Impl, seq, atlas, soft)
-	return Scene.new(impl, nil, transparent)
-end
+		local impl = M.Impl(seq, atlas, soft)
+		return Scene(impl, nil, transparent)
+	end
+)
 
 return M

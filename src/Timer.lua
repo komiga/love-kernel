@@ -1,7 +1,7 @@
 
 require("src/Util")
 
-local M = def_module("Timer", nil)
+local M = def_module_unit("Timer", nil)
 
 -- class Timer
 
@@ -45,12 +45,6 @@ function M.Unit:update(dt)
 		end
 	end
 	return false
-end
-
--- Timer interface
-
-function M.new(duration)
-	return new_object(M.Unit, duration)
 end
 
 return M
