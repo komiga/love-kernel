@@ -2,7 +2,7 @@
 require("src/Util")
 require("src/AudioManager")
 
-local M = def_module("Camera", {
+local M = def_module_unit("Camera", {
 	__love_translate = Gfx.translate,
 	__initialized = false,
 	cam = nil
@@ -18,6 +18,9 @@ end
 -- class Camera
 
 M.Unit = class(M.Unit)
+
+-- If speed is 0, :move() and :target()
+-- are the same as :set_position()
 
 function M.Unit:__init(x, y, speed)
 	type_assert(x, "number")
@@ -100,16 +103,10 @@ end
 
 -- Camera interface
 
--- If speed is 0, :move() and :target()
--- are the same as :set_position()
-function M.new(x, y, speed)
-	return new_object(M.Unit, x, y, speed)
-end
-
 function M.init(x, y, speed)
 	assert(not M.data.__initialized)
 
-	M.data.cam = Camera.new(x, y, speed)
+	M.data.cam = Camera(x, y, speed)
 
 	M.data.__initialized = true
 	return M.data.cam
