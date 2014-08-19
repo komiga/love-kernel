@@ -30,7 +30,7 @@ end
 function is_type(x, tc)
 	return
 		type(tc) == "table"
-		and tc == x.__index
+		and (type(x) == "table" and tc == x.__index)
 		or  tc == type(x)
 end
 
