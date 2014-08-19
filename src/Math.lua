@@ -7,24 +7,24 @@ local M = def_module("Math", nil)
 
 Vec2 = class(Vec2)
 
-function Vec2:__init(x, y)
-	if is_type(x, Vec2)
+function Vec2:__init(xv, y)
+	if is_type(xv, Vec2) then
 		type_assert(y, "nil")
-		self:set(x)
+		self:set(xv)
 	else
-		self:set(x or 0, y or 0)
+		self:set(xv or 0, y or 0)
 	end
 end
 
-function Vec2:set(x, y)
-	if is_type(x, Vec2)
+function Vec2:set(xv, y)
+	if is_type(xv, Vec2) then
 		type_assert(y, "nil")
-		self.x = y.x
-		self.y = y.y
+		self.x = xv.x
+		self.y = xv.y
 	else
-		type_assert(x, "number")
+		type_assert(xv, "number")
 		type_assert(y, "number")
-		self.x = x
+		self.x = xv
 		self.y = y
 	end
 end
@@ -58,37 +58,37 @@ function Vec2.__unm(l)
 end
 
 function Vec2.__add(l, r)
-	if is_type(x, Vec2) then
+	if is_type(r, Vec2) then
 		return Vec2(l.x + r.x, l.y + r.y)
 	else
-		type_assert(x, "number")
+		type_assert(r, "number")
 		return Vec2(l.x + r, l.y + r)
 	end
 end
 
 function Vec2.__sub(l, r)
-	if is_type(x, Vec2) then
+	if is_type(r, Vec2) then
 		return Vec2(l.x - r.x, l.y - r.y)
 	else
-		type_assert(x, "number")
+		type_assert(r, "number")
 		return Vec2(l.x - r, l.y - r)
 	end
 end
 
 function Vec2.__mul(l, r)
-	if is_type(x, Vec2) then
+	if is_type(r, Vec2) then
 		return Vec2(l.x * r.x, l.y * r.y)
 	else
-		type_assert(x, "number")
+		type_assert(r, "number")
 		return Vec2(l.x * r, l.y * r)
 	end
 end
 
 function Vec2.__div(l, r)
-	if is_type(x, Vec2) then
+	if is_type(r, Vec2) then
 		return Vec2(l.x / r.x, l.y / r.y)
 	else
-		type_assert(x, "number")
+		type_assert(r, "number")
 		return Vec2(l.x / r, l.y / r)
 	end
 end
