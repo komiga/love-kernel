@@ -11,15 +11,18 @@ HID = {
 }
 
 require("src/State")
+require("src/Math")
 require("src/Core")
+
+HID.Mouse.pos = Vec2()
 
 local lurker = nil
 
 local function module_reload(path)
 	local modname = lurker.modname(path)
-	local module = require(modname)
-	if "table" == type(module) and module.module_reload then
-		module.module_reload()
+	local mod = require(modname)
+	if "table" == type(mod) and mod.module_reload then
+		mod.module_reload()
 	end
 end
 
@@ -74,6 +77,7 @@ function love.run()
 
 		while sim_time <= current_time do
 			update_screen = true
+			HID.Mouse.pos:set(HID.Mouse.getX(), HID.Mouse.getY())
 
 			Event.pump()
 			for event, a, b, c, d in Event.poll() do
