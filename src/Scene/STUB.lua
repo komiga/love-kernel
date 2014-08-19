@@ -23,15 +23,13 @@ local M = def_module("STUBScene", {
 })
 
 M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
-	["mouse1"] = {
-		on_active = true,
+	["escape"] = {
+		on_release = true,
+		passthrough = false,
 		handler = function(_, _, _, _)
-			Camera.target(
-				Camera.srel_x(HID.Mouse.getX()),
-				Camera.srel_y(HID.Mouse.getY())
-			)
+			Event.quit()
 		end
-	}
+	},
 })
 
 -- class Impl
