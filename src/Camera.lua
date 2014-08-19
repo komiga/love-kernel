@@ -29,9 +29,25 @@ function M.Unit:__init(position, t_speed)
 	self.locked = false
 end
 
+function M.Unit:get_position()
+	return Vec2(self.position)
+end
+
 function M.Unit:set_position(xv, y)
 	self.t_distance = 0
 	self.position:set(xv, y)
+end
+
+-- World space -> camera space
+function M.Unit:world_to_camera(xv, y)
+	local world = Vec2(xv, y)
+	return world + self.position + Core.display_size_half
+end
+
+-- Camera space -> world space
+function M.Unit:camera_to_world(xv, y)
+	local camera = Vec2(xv, y)
+	return camera + self.position - Core.display_size_half
 end
 
 function M.Unit:target(xv, y)
@@ -85,32 +101,8 @@ end
 function M.init(position, t_speed)
 	assert(not M.data.__initialized)
 	M.data.__initialized = true
-	M.data.current = Camera(position, t_speed)
+	Camera.set(Camera(position, t_speed))
 	return M.data.current
-end
-
-function M.srel_x(x)
-	return M.data.current.position.x - Core.display_size_half.x + x
-end
-
-function M.srel_y(y)
-	return M.data.current.position.y - Core.display_size_half.y + y
-end
-
-function M.rel_x(x)
-	return x + M.data.current.position.x
-end
-
-function M.rel_y(y)
-	return y + M.data.current.position.y
-end
-
-function M.srel(x, y)
-	return rel_x(x), rel_y(y)
-end
-
-function M.rel(x, y)
-	return rel_x(x), rel_y(y)
 end
 
 function M.get()
@@ -121,30 +113,42 @@ function M.set(cam)
 	M.data.current = cam
 end
 
+function M.get_position()
+	return Camera.get():get_position()
+end
+
 function M.set_position(xv, y)
-	M.data.current:set_position(xv, y)
+	Camera.get():set_position(xv, y)
+end
+
+function M.world_to_camera(xv, y)
+	return Camera.get():world_to_camera(xv, y)
+end
+
+function M.camera_to_world(xv, y)
+	return Camera.get():camera_to_world(xv, y)
 end
 
 function M.target(xv, y)
-	M.data.current:target(xv, y)
+	Camera.get():target(xv, y)
 end
 
 function M.move(xv, y)
-	M.data.current:move(xv, y)
+	Camera.get():move(xv, y)
 end
 
 function M.update(dt)
-	local cam = M.get()
+	local cam = Camera.get()
 	AudioManager.set_position(cam.position.x, cam.position.y)
 	cam:update(dt)
 end
 
 function M.lock()
-	M.data.current:lock()
+	Camera.get():lock()
 end
 
 function M.unlock()
-	M.data.current:unlock()
+	Camera.get():unlock()
 end
 
 return M

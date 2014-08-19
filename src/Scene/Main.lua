@@ -1,6 +1,7 @@
 
 require("src/State")
 require("src/Util")
+require("src/Math")
 require("src/Bind")
 require("src/Scene")
 require("src/Camera")
@@ -34,18 +35,13 @@ M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
 		on_active = true,
 		on_release = true,
 		data = {
-			x_origin = 0,
-			y_origin = 0,
+			origin = Vec2(),
 		},
 		handler = function(_, _, kind, bind)
 			if Bind.Kind.Press == kind then
-				bind.data.x_origin = Camera.srel_x(HID.Mouse.getX())
-				bind.data.y_origin = Camera.srel_y(HID.Mouse.getY())
+				bind.data.origin = Camera.camera_to_world(HID.Mouse.pos) + Core.display_size_half
 			elseif Bind.Kind.Active == kind then
-				Camera.set_position(
-					bind.data.x_origin + Core.display_width_half - HID.Mouse.getX(),
-					bind.data.y_origin + Core.display_height_half - HID.Mouse.getY()
-				)
+				Camera.set_position(bind.data.origin - HID.Mouse.pos)
 			end
 		end
 	},
@@ -57,10 +53,7 @@ M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
 				Bind.Kind.Active ~= kind or
 				Bind.has_modifiers_any("lctrl", "rctrl")
 			then
-				Camera.target(
-					Camera.srel_x(HID.Mouse.getX()),
-					Camera.srel_y(HID.Mouse.getY())
-				)
+				Camera.target(Camera.camera_to_world(HID.Mouse.pos))
 			end
 		end
 	},
@@ -82,8 +75,7 @@ M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
 	[{" "}] = {
 		on_release = true,
 		handler = function(_, _, _, _)
-			local rx = Camera.srel_x(HID.Mouse.getX())
-			local ry = Camera.srel_y(HID.Mouse.getY())
+			local r = Camera.camera_to_world(HID.Mouse.pos)
 			AudioManager.spawn(Asset.sound.waaauu)
 			Hooker.spawn(
 				Asset.hooklets.KUMQUAT,
@@ -202,15 +194,21 @@ function M.Impl:render()
 	b:render()
 	Gfx.pop()
 
-	Gfx.setColor(0,255,0, 255)
-	Gfx.rectangle("line",
-		Camera.srel_x(HID.Mouse.getX() - 16),
-		Camera.srel_y(HID.Mouse.getY() - 16),
-		32, 32
-	)
+	if State.gfx_debug_cross then
+		Gfx.setColor(255,128,0, 255)
+		local pos = Camera.get().position - 16
+		Gfx.rectangle("line", pos.x, pos.y, 32, 32)
+	end
 
 	Hooker.render()
 	Camera.unlock()
+
+	Gfx.setColor(0,255,0, 255)
+	Gfx.rectangle("line",
+		HID.Mouse.pos.x - 16,
+		HID.Mouse.pos.y - 16,
+		32, 32
+	)
 end
 
 -- MainScene interface
