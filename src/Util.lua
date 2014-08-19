@@ -27,25 +27,28 @@ function optional(value, default)
 		or default
 end
 
+function is_type(x, tc)
+	return
+		type(tc) == "table"
+		and tc == x.__index
+		or  tc == type(x)
+end
+
 function type_assert(x, tc, opt)
 	opt = optional(opt, false)
 	assert(
 		(opt and nil == x)
-		or type(tc) == "table"
-			and tc == x.__index
-			or  tc == type(x)
+		or is_type(x, tc),
+		"type_assert: '" .. tostring(x) .. "' (a " .. type(x) .. ") is not of type " .. tostring(tc)
 	)
 end
 
 function type_assert_obj(x, tc, opt)
 	opt = optional(opt, false)
-	if nil == x then
-		assert(opt)
-	else
-		if not x:typeOf(tc) then
-			assert(false)
-		end
-	end
+	assert(
+		(opt and nil == x)
+		or x:typeOf(tc)
+	)
 end
 
 function table.last(table)
