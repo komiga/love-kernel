@@ -1,19 +1,12 @@
 
 require("src/Util")
+require("src/Math")
 require("src/AudioManager")
 
 local M = def_module_unit("Camera", {
-	__love_translate = Gfx.translate,
 	__initialized = false,
-	cam = nil
+	current = nil
 })
-
-M.data.__camera_translate = function(x, y)
-	M.data.__love_translate(
-		Core.display_width_half - M.data.cam.x + x,
-		Core.display_height_half - M.data.cam.y + y
-	)
-end
 
 -- class Camera
 
@@ -22,110 +15,94 @@ M.Unit = class(M.Unit)
 -- If speed is 0, :move() and :target()
 -- are the same as :set_position()
 
-function M.Unit:__init(x, y, speed)
-	type_assert(x, "number")
-	type_assert(y, "number")
-	type_assert(speed, "number", true)
+function M.Unit:__init(position, t_speed)
+	type_assert(position, Vec2)
+	type_assert(t_speed, "number")
 
-	speed = optional(speed, 0)
-
-	self.x = x
-	self.y = y
-	self.speed = speed
-	self.time = 0
-	self.distance = 0
-	self.x_origin = 0
-	self.y_origin = 0
-	self.x_target = 0
-	self.y_target = 0
-	self.x_speed = 0
-	self.y_speed = 0
+	self.position = Vec2(position)
+	self.t_speed = math.max(0, t_speed)
+	self.t_time = 0
+	self.t_distance = 0
+	self.t_origin = Vec2()
+	self.t_position = Vec2()
+	self.t_velocity = Vec2()
 	self.locked = false
 end
 
-function M.Unit:set_position(x, y)
-	self.distance = 0
-	self.x = x
-	self.y = y
+function M.Unit:set_position(xv, y)
+	self.t_distance = 0
+	self.position:set(xv, y)
 end
 
-function M.Unit:target(x, y)
-	if 0 == self.speed then
-		self.x = x
-		self.y = y
-	elseif x ~= self.x or y ~= self.y then
-		local rx = x - self.x
-		local ry = y - self.y
-		self.time = 0
-		self.distance = math.sqrt((rx * rx) + (ry * ry))
-		self.x_origin = self.x
-		self.y_origin = self.y
-		self.x_target = x
-		self.y_target = y
-		self.x_speed = rx / self.distance
-		self.y_speed = ry / self.distance
+function M.Unit:target(xv, y)
+	local t = Vec2(xv, y)
+	if 0 == self.t_speed then
+		self.t_distance = 0
+		self.position:set(t)
+	elseif t ~= self.position then
+		local d = t - self.position
+		self.t_time = 0
+		self.t_distance = d:length()
+		self.t_origin:set(self.position)
+		self.t_position:set(t)
+		self.t_velocity = d:normalize()
 	end
 end
 
-function M.Unit:move(x, y)
-	self:target(self.x + x, self.y + y)
+function M.Unit:move(xv, y)
+	self:target(self.position + Vec2(xv, y))
 end
 
 function M.Unit:update(dt)
-	if 0 ~= self.distance then
-		self.time = self.time + dt
-		local travelled = self.time * self.speed
-		if travelled >= self.distance then
-			self.distance = 0
-			self.x = self.x_target
-			self.y = self.y_target
+	if 0 ~= self.t_distance then
+		self.t_time = self.t_time + dt
+		local travelled = self.t_time * self.t_speed
+		if travelled >= self.t_distance then
+			self.t_distance = 0
+			self.position:set(self.t_position)
 		else
-			self.x = self.x_origin + travelled * self.x_speed
-			self.y = self.y_origin + travelled * self.y_speed
+			self.position:set(self.t_origin + self.t_velocity * travelled)
 		end
 	end
 end
 
 function M.Unit:lock()
 	assert(not self.locked)
+	local trans = Core.display_size_half - self.position
 	Gfx.push()
-	Gfx.translate = M.data.__camera_translate
-	Gfx.translate(0, 0)
+	Gfx.translate(trans.x, trans.y)
 	self.locked = true
 end
 
 function M.Unit:unlock()
 	assert(self.locked)
-	Gfx.translate = M.data.__love_translate
 	Gfx.pop()
 	self.locked = false
 end
 
 -- Camera interface
 
-function M.init(x, y, speed)
+function M.init(position, t_speed)
 	assert(not M.data.__initialized)
-
-	M.data.cam = Camera(x, y, speed)
-
 	M.data.__initialized = true
-	return M.data.cam
+	M.data.current = Camera(position, t_speed)
+	return M.data.current
 end
 
 function M.srel_x(x)
-	return M.data.cam.x - Core.display_width_half + x
+	return M.data.current.position.x - Core.display_size_half.x + x
 end
 
 function M.srel_y(y)
-	return M.data.cam.y - Core.display_height_half + y
+	return M.data.current.position.y - Core.display_size_half.y + y
 end
 
 function M.rel_x(x)
-	return x + M.data.cam.x
+	return x + M.data.current.position.x
 end
 
 function M.rel_y(y)
-	return y + M.data.cam.y
+	return y + M.data.current.position.y
 end
 
 function M.srel(x, y)
@@ -137,36 +114,37 @@ function M.rel(x, y)
 end
 
 function M.get()
-	return M.data.cam
+	return M.data.current
 end
 
 function M.set(cam)
-	M.data.cam = cam
+	M.data.current = cam
 end
 
-function M.set_position(x, y)
-	M.data.cam:set_position(x, y)
+function M.set_position(xv, y)
+	M.data.current:set_position(xv, y)
 end
 
-function M.target(x, y)
-	M.data.cam:target(x, y)
+function M.target(xv, y)
+	M.data.current:target(xv, y)
 end
 
-function M.move(x, y)
-	M.data.cam:move(x, y)
+function M.move(xv, y)
+	M.data.current:move(xv, y)
 end
 
 function M.update(dt)
-	AudioManager.set_position(M.data.cam.x, M.data.cam.y)
-	M.data.cam:update(dt)
+	local cam = M.get()
+	AudioManager.set_position(cam.position.x, cam.position.y)
+	cam:update(dt)
 end
 
 function M.lock()
-	M.data.cam:lock()
+	M.data.current:lock()
 end
 
 function M.unlock()
-	M.data.cam:unlock()
+	M.data.current:unlock()
 end
 
 return M

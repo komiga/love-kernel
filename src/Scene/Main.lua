@@ -182,8 +182,6 @@ function M.Impl:render()
 
 	local b, a, t
 
-	Gfx.point(0, 0)
-
 	a = Asset.atlas.sprites
 	t = a.__tex
 	Gfx.draw(t, 128,128)
@@ -222,7 +220,7 @@ function M.init(_)
 	if not M.data.bind_group then
 		M.data.bind_group = Bind.Group(M.data.bind_table)
 	end
-	Camera.init(Core.display_width_half, Core.display_height_half, 400.0)
+	Camera.init(Core.display_size_half, 400.0)
 	Hooker.init(Asset.hooklets, Asset.font.main)
 
 	M.data.instance = Scene(M.Impl(), M.data.bind_group, false)
