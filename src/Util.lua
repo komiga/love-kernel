@@ -152,6 +152,18 @@ function def_module_unit(name, data)
 	return m
 end
 
+function min(x, y)
+	return x < y and x or y
+end
+
+function max(x, y)
+	return x > y and x or y
+end
+
+function clamp(x, min, max)
+	return x < min and min or x > max and max or x
+end
+
 -- takes:
 --	(rgba, alpha_opt),
 --	(rgb, alpha), or
