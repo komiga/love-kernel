@@ -17,6 +17,7 @@ require("src/Core")
 HID.Mouse.pos = Vec2()
 
 local lurker = nil
+local lovebird = nil
 
 local function module_reload(path)
 	local modname = lurker.modname(path)
@@ -32,13 +33,20 @@ if State.auto_reload then
 	lurker.postswap = module_reload
 end
 
+if State.enable_lovebird then
+	lovebird = require("dep/lovebird/lovebird")
+end
+
 function love.load(argv)
 	Core.init(argv)
 end
 
 function love.update(dt)
-	if State.auto_reload then
+	if State.auto_reload and lurker then
 		lurker.update()
+	end
+	if State.enable_lovebird and lovebird then
+		lovebird.update()
 	end
 	Core.update(dt)
 end

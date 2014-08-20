@@ -4,3 +4,6 @@
 [submodule "dep/lume"]
 	path = dep/lume
 	url = git@github.com:rxi/lume.git
+[submodule "dep/lovebird"]
+	path = dep/lovebird
+	url = git@github.com:rxi/lovebird.git

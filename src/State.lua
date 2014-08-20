@@ -11,5 +11,6 @@ State.paused = false
 State.pause_lock = false
 
 State.auto_reload = true
+State.enable_lovebird = true
 
 return M
