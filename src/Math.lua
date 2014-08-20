@@ -153,4 +153,29 @@ function Vec2:angle_to(v)
 	return math.atan2(self.y, self.x) - math.atan2(v.x, v.y)
 end
 
+-- Math interface
+
+function M.lerp(v0, v1, t)
+	return v0 * (1 - t) + v1 * t
+end
+
+function M.bezier_cubic(v0, v1, v2, v3, t)
+	-- Brute force:
+	--return Math.lerp(
+	--	Math.lerp(Math.lerp(v0, v1, t), Math.lerp(v1, v2, t), t),
+	--	Math.lerp(Math.lerp(v1, v2, t), Math.lerp(v2, v3, t), t),
+	--	t
+	--)
+
+	-- Reduction
+	local r = 1 - t
+	local i2 = v2 * 3*r * t*t
+	r = r*r
+	return
+		(v0 * r*r) +
+		(v1 * r * 3*t) +
+		i2 +
+		(v3 * t*t*t)
+end
+
 return M
