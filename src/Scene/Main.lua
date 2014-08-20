@@ -109,6 +109,15 @@ function M.Impl:__init()
 		Animator.Instance(anim_data, 1, Animator.Mode.Bounce),
 		Animator.Instance(anim_data, 2, Animator.Mode.Bounce)
 	}
+	self.moving_square[1].x, self.moving_square[1].y = 32, 32
+	self.moving_square[2].x, self.moving_square[2].y = 32, 64
+	self.moving_square[3].x, self.moving_square[3].y = 64, 64
+	self.moving_square[4].x, self.moving_square[4].y = 64, 32
+	self.batcher:batch_begin()
+	for _, i in pairs(self.moving_square) do
+		self.batcher:add(i)
+	end
+	self.batcher:batch_end()
 	self.pending_pause = false
 end
 
@@ -160,36 +169,17 @@ function M.Impl:update(dt)
 
 	Camera.update(dt)
 	Hooker.update(dt)
-
-	for _, anim in ipairs(self.moving_square) do
-		anim:update(dt)
-	end
+	self.batcher:update(dt)
 end
 
 function M.Impl:render()
 	Camera.lock()
 
-	local b, a, t
+	Gfx.draw(Asset.atlas.sprites.tex, 128,128)
+	Gfx.draw(Asset.atlas.sprites.tex, Asset.atlas.sprites.a, 200,128)
+	Gfx.draw(Asset.atlas.sprites.tex, Asset.atlas.sprites.b, 240,128)
 
-	a = Asset.atlas.sprites
-	t = a.__tex
-	Gfx.draw(t, 128,128)
-	Gfx.draw(t, a.a, 160,192)
-	Gfx.draw(t, a.b, 128,160)
-
-	a = self.moving_square
-	b = self.batcher
-
-	Gfx.push()
-	--Gfx.translate(-32.0, 0.0)
-	b:batch_begin()
-		b:add(a[1], 32, 32)
-		b:add(a[2], 32, 64)
-		b:add(a[3], 64, 64)
-		b:add(a[4], 64, 32)
-	b:batch_end()
-	b:render()
-	Gfx.pop()
+	self.batcher:render()
 
 	if State.gfx_debug_cross then
 		Gfx.setColor(255,128,0, 255)
