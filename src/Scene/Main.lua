@@ -77,10 +77,7 @@ M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
 		handler = function(_, _, _, _)
 			local r = Camera.camera_to_world(HID.Mouse.pos)
 			AudioManager.spawn(Asset.sound.waaauu)
-			Hooker.spawn(
-				Asset.hooklets.KUMQUAT,
-				rx,ry
-			)
+			Hooker.spawn(Asset.hooklets.KUMQUAT, r.x, r.y)
 		end
 	},
 	["c"] = {
