@@ -69,27 +69,31 @@ local function get_trace()
 	return info.short_src .. " @ " .. pad(tostring(info.currentline), 4)
 end
 
-function log(...)
-	print(...)
+function log(msg, ...)
+	type_assert(msg, "string")
+	print(string.format(msg, ...))
 end
 
 function trace()
-	log(get_trace() .. ": TRACE")
+	print(get_trace() .. ": TRACE")
 end
 
 function log_traced(msg, ...)
-	log(get_trace() .. ": " .. msg, ...)
+	type_assert(msg, "string")
+	print(get_trace() .. ": " .. string.format(msg, ...))
 end
 
 function log_debug_sys(sys, msg, ...)
+	type_assert(msg, "string")
 	if true == sys then
-		log(get_trace() .. ": debug: " .. msg, ...)
+		print(get_trace() .. ": debug: " .. string.format(msg, ...))
 	end
 end
 
 function log_debug(msg, ...)
+	type_assert(msg, "string")
 	if true == State.gen_debug then
-		log(get_trace() .. ": debug: " .. msg, ...)
+		print(get_trace() .. ": debug: " .. string.format(msg, ...))
 	end
 end
 
