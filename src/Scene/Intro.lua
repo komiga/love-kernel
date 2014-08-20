@@ -207,7 +207,7 @@ function M.Impl:render()
 		local quad = self.atlas[self:current_seq().name]
 		local _, _, w, h = quad:getViewport()
 		Gfx.draw(
-			self.atlas.__tex,
+			self.atlas.tex,
 			quad,
 			Core.display_width_half - (w / 2),
 			Core.display_height_half - (h / 2)

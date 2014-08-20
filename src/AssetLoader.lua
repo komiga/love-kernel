@@ -117,13 +117,13 @@ Kind.atlas = {
 		type_assert(tex, "table")
 
 		local atlas = {
-			__tex = Gfx.newImage(
+			tex = Gfx.newImage(
 				get_asset_path(root_path, desc.path, name, desc.ext or "png")
 			)
 		}
 
-		local aw = atlas.__tex:getWidth()
-		local ah = atlas.__tex:getHeight()
+		local aw = atlas.tex:getWidth()
+		local ah = atlas.tex:getHeight()
 		local x0,y0, sw,sh
 		local idx, t
 
