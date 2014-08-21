@@ -207,7 +207,7 @@ function M.init(_)
 
 	M.data.instance = Scene(M.Impl(), M.data.bind_group, false)
 	M.data.impl = M.data.instance.impl
-	Core.set_focus_fn(focus_changed)
+	Core.set_focus_fn(M.focus_changed)
 	M.data.__initialized = true
 
 	return M.data.instance
