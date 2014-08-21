@@ -103,20 +103,17 @@ function M.Impl:__init()
 	self.batcher = Animator.Batcher(
 		anim_data, 4, Animator.BatchMode.Dynamic
 	)
-	self.moving_square = {
-		Animator.Instance(anim_data, 1, Animator.Mode.Bounce),
-		Animator.Instance(anim_data, 2, Animator.Mode.Bounce),
-		Animator.Instance(anim_data, 1, Animator.Mode.Bounce),
-		Animator.Instance(anim_data, 2, Animator.Mode.Bounce)
-	}
-	self.moving_square[1].x, self.moving_square[1].y = 32, 32
-	self.moving_square[2].x, self.moving_square[2].y = 32, 64
-	self.moving_square[3].x, self.moving_square[3].y = 64, 64
-	self.moving_square[4].x, self.moving_square[4].y = 64, 32
-	self.batcher:batch_begin()
-	for _, i in pairs(self.moving_square) do
-		self.batcher:add(i)
+	local make_sq = function(sprite_index, x, y)
+		local i = Animator.Instance(anim_data, sprite_index, Animator.Mode.Bounce)
+		i.x = x
+		i.y = y
+		return i
 	end
+	self.batcher:batch_begin()
+		self.batcher:add(make_sq(1, 32, 32))
+		self.batcher:add(make_sq(2, 32, 64))
+		self.batcher:add(make_sq(1, 64, 64))
+		self.batcher:add(make_sq(2, 64, 32))
 	self.batcher:batch_end()
 	self.pending_pause = false
 end
