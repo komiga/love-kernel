@@ -197,7 +197,7 @@ function M.Impl:render()
 	)
 	Gfx.rectangle("fill",
 		0,0,
-		Core.display_width, Core.display_height
+		Core.display_size.x, Core.display_size.y
 	)
 	Gfx.setColor(
 		255,255,255,
@@ -209,8 +209,8 @@ function M.Impl:render()
 		Gfx.draw(
 			self.atlas.tex,
 			quad,
-			Core.display_width_half - (w / 2),
-			Core.display_height_half - (h / 2)
+			Core.display_size_half.x - (w / 2),
+			Core.display_size_half.y - (h / 2)
 		)
 	end
 end

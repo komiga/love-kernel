@@ -46,10 +46,6 @@ function M.init(args)
 
 	Core.display_size = Vec2(Gfx.getWidth(), Gfx.getHeight())
 	Core.display_size_half = Core.display_size * 0.5
-	Core.display_width = Core.display_size.x
-	Core.display_width_half = Core.display_size_half.x
-	Core.display_height = Core.display_size.y
-	Core.display_height_half = Core.display_size_half.y
 
 	if not debug_mode_temp then
 		M.data.bind_table["f1"] = {
@@ -174,35 +170,15 @@ function M.render()
 
 	if State.gfx_debug then
 		Gfx.setColor(192,192,192, 200)
-		-- Full quad
-		Gfx.rectangle("line",
-			0.0,0.0,
-			Core.display_width, Core.display_height
-		)
+		Gfx.rectangle("line", 0.0, 0.0, Core.display_size.x, Core.display_size.y)
 	end
 
 	if State.gfx_debug_cross then
 		Gfx.setColor(192,192,192, 200)
-		-- Top left
-		Gfx.rectangle("line",
-			0.0,0.0,
-			Core.display_width_half, Core.display_height_half
-		)
-		-- Top Right
-		Gfx.rectangle("line",
-			Core.display_width_half, 0.0,
-			Core.display_width_half, Core.display_height_half
-		)
-		-- Bottom left
-		Gfx.rectangle("line",
-			0.0, Core.display_height_half,
-			Core.display_width_half, Core.display_height_half
-		)
-		-- Bottom Right
-		Gfx.rectangle("line",
-			Core.display_width_half, Core.display_height_half,
-			Core.display_width_half, Core.display_height_half
-		)
+		-- Vertical
+		Gfx.line(Core.display_size_half.x, 0.0, Core.display_size_half.x, Core.display_size.y)
+		-- Horizontal
+		Gfx.line(0.0, Core.display_size_half.y, Core.display_size.x, Core.display_size_half.y)
 	end
 end
 
