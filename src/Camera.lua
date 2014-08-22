@@ -20,6 +20,8 @@ function M.Unit:__init(position, t_speed)
 	type_assert(t_speed, "number")
 
 	self.position = Vec2(position)
+	self.rotation = 0
+	self.scale = 1
 	self.t_speed = math.max(0, t_speed)
 	self.t_time = 0
 	self.t_distance = 0
@@ -38,16 +40,34 @@ function M.Unit:set_position(xv, y)
 	self.position:set(xv, y)
 end
 
+function M.Unit:get_scale()
+	return self.scale
+end
+
+function M.Unit:set_scale(scale)
+	self.scale = max(scale, 0.125)
+end
+
+function M.Unit:get_rotation()
+	return self.rotation
+end
+
+function M.Unit:set_rotation(rotation)
+	self.rotation = rotation
+end
+
 -- World space -> camera space
 function M.Unit:world_to_camera(xv, y)
-	local world = Vec2(xv, y)
-	return world + self.position + Core.display_size_half
+	local wv = Vec2(xv, y) - self.position
+	-- wv:rotate(self.rotation)
+	return wv --[[* self.scale--]] + Core.display_size_half
 end
 
 -- Camera space -> world space
 function M.Unit:camera_to_world(xv, y)
-	local camera = Vec2(xv, y)
-	return camera + self.position - Core.display_size_half
+	local cv = (Vec2(xv, y) - Core.display_size_half) --[[/ self.scale--]]
+	-- cv:rotate(-self.rotation)
+	return cv + self.position
 end
 
 function M.Unit:target(xv, y)
@@ -84,9 +104,12 @@ end
 
 function M.Unit:lock()
 	assert(not self.locked)
-	local trans = Core.display_size_half - self.position
+	local center = Core.display_size_half / self.scale
 	Gfx.push()
-	Gfx.translate(trans.x, trans.y)
+	Gfx.scale(self.scale, self.scale)
+	Gfx.translate(center.x, center.y)
+	Gfx.rotate(self.rotation)
+	Gfx.translate(-self.position.x, -self.position.y)
 	self.locked = true
 end
 
@@ -119,6 +142,22 @@ end
 
 function M.set_position(xv, y)
 	Camera.get():set_position(xv, y)
+end
+
+function M.get_scale()
+	return Camera.get():get_scale()
+end
+
+function M.set_scale(scale)
+	Camera.get():set_scale(scale)
+end
+
+function M.get_rotation()
+	return Camera.get():get_rotation()
+end
+
+function M.set_rotation(rotation)
+	Camera.get():set_rotation(rotation)
 end
 
 function M.world_to_camera(xv, y)
