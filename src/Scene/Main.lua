@@ -57,6 +57,26 @@ M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
 			end
 		end
 	},
+	["mwheelup"] = {
+		on_press = true,
+		handler = function(ident, _, _, _)
+			if Bind.has_modifiers_any("lshift", "rshift") then
+				Camera.set_rotation(Camera.get_rotation() + math.pi/16)
+			else
+				Camera.set_scale(Camera.get_scale() + 0.25)
+			end
+		end
+	},
+	["mwheeldown"] = {
+		on_press = true,
+		handler = function(ident, _, _, _)
+			if Bind.has_modifiers_any("lshift", "rshift") then
+				Camera.set_rotation(Camera.get_rotation() - math.pi/16)
+			else
+				Camera.set_scale(Camera.get_scale() - 0.25)
+			end
+		end
+	},
 	[{"up", "down", "left", "right"}] = {
 		on_active = true,
 		handler = function(ident, _, _, _)
