@@ -115,7 +115,6 @@ function M.Impl:__init()
 		self.batcher:add(make_sq(1, 64, 64))
 		self.batcher:add(make_sq(2, 64, 32))
 	self.batcher:batch_end()
-	self.pending_pause = false
 end
 
 function M.Impl:push_intro()
@@ -127,25 +126,11 @@ function M.Impl:push_intro()
 	))
 end
 
-function M.Impl:pause(on)
-	if not State.pause_lock then
-		if self.scene_unit:is_top() then
-			Core.pause(on)
-		else
-			self.pending_pause = on
-		end
-	end
-end
-
 function M.Impl:notify_pushed()
 	-- self:push_intro()
 end
 
 function M.Impl:notify_became_top()
-	if self.pending_pause then
-		self.pending_pause = false
-		Core.pause(true)
-	end
 end
 
 function M.Impl:notify_popped()
@@ -157,6 +142,10 @@ function M.Impl:bind_gate(bind, ident, dt, kind)
 	--	return true
 	--end
 	return not State.paused
+end
+
+function M.Impl:on_pause_changed(new_paused)
+	return true
 end
 
 function M.Impl:update(dt)
@@ -207,7 +196,6 @@ function M.init(_)
 
 	M.data.instance = Scene(M.Impl(), M.data.bind_group, false)
 	M.data.impl = M.data.instance.impl
-	Core.set_focus_fn(M.focus_changed)
 	M.data.__initialized = true
 
 	return M.data.instance
@@ -215,12 +203,6 @@ end
 
 function M.get_instance()
 	return M.data.instance
-end
-
-function M.focus_changed(focused)
-	if not State.pause_lock then
-		M.data.impl:pause(not focused)
-	end
 end
 
 return M

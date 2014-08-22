@@ -18,6 +18,7 @@ function M.Unit:__init(impl, bind_group, transparent)
 	type_assert(impl.update, "function")
 	type_assert(impl.render, "function")
 	type_assert(impl.bind_gate, "function", true)
+	type_assert(impl.on_pause_changed, "function", true)
 	type_assert(bind_group, Bind.Group, true)
 	type_assert(transparent, "boolean", true)
 
@@ -66,6 +67,13 @@ function M.Unit:bind_gate(bind, ident, dt, kind)
 	return true
 end
 
+function M.Unit:on_pause_changed(new_paused)
+	if nil ~= self.impl.on_pause_changed then
+		return self.impl:on_pause_changed(new_paused)
+	end
+	return true
+end
+
 function M.Unit:update(dt)
 	self.impl:update(dt)
 end
@@ -91,11 +99,15 @@ function M.current()
 end
 
 function M.push(scene)
+	type_assert(scene, Scene.Unit)
+
 	table.insert(M.data.stack, scene)
 	scene:notify_pushed()
 end
 
 function M.pop(scene)
+	type_assert(scene, Scene.Unit)
+
 	if 0 == M.count() then
 		log_debug("Scene.pop(): attempted to pop on empty stack")
 	end
@@ -120,6 +132,14 @@ function M.bind_gate(bind, ident, dt, kind)
 	local scene = M.current()
 	if nil ~= scene then
 		return scene:bind_gate(bind, ident, dt, kind)
+	end
+	return true
+end
+
+function M.on_pause_changed(new_paused)
+	local scene = M.current()
+	if nil ~= scene then
+		return scene:on_pause_changed(new_paused)
 	end
 	return true
 end

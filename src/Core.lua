@@ -11,8 +11,7 @@ require("src/AssetLoader")
 require("src/Scene/Main")
 
 local M = def_module("Core", {
-	bind_table = nil,
-	focus_fn = nil
+	bind_table = nil
 })
 
 M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
@@ -135,6 +134,9 @@ end
 
 function M.pause(paused)
 	if not State.pause_lock then
+		if not Scene.on_pause_changed(paused) then
+			return
+		end
 		State.paused = paused
 		if State.paused then
 			AudioManager.pause()
@@ -144,13 +146,9 @@ function M.pause(paused)
 	end
 end
 
-function M.set_focus_fn(fn)
-	M.data.focus_fn = fn
-end
-
 function M.focus_changed(focused)
-	if nil ~= M.data.focus_fn then
-		M.data.focus_fn(focused)
+	if not State.pause_lock then
+		Core.pause(not focused)
 	end
 end
 
