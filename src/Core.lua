@@ -11,7 +11,9 @@ require("src/AssetLoader")
 require("src/Scene/Main")
 
 local M = def_module("Core", {
-	bind_table = nil
+	bind_table = nil,
+	display_size = Vec2(),
+	display_size_half = Vec2()
 })
 
 M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
@@ -35,6 +37,12 @@ function M.bind_gate(bind, ident, dt, kind)
 	return Scene.bind_gate(bind, ident, dt, kind)
 end
 
+function M.update_display_size(width, height)
+	Core.display_size = Vec2(width, height)
+	Core.display_size_half = Core.display_size * 0.5
+	log_traced("Core.update_display_size: %s, %s", Core.display_size, Core.display_size_half)
+end
+
 function M.init(args)
 	-- Ensure debug is enabled for initialization
 	local debug_mode_temp = false
@@ -43,8 +51,7 @@ function M.init(args)
 		State.gen_debug = true
 	end
 
-	Core.display_size = Vec2(Gfx.getWidth(), Gfx.getHeight())
-	Core.display_size_half = Core.display_size * 0.5
+	Core.update_display_size(Gfx.getWidth(), Gfx.getHeight())
 
 	if not debug_mode_temp then
 		M.data.bind_table["f1"] = {
@@ -150,6 +157,10 @@ function M.focus_changed(focused)
 	if not State.pause_lock then
 		Core.pause(not focused)
 	end
+end
+
+function M.display_resized(width, height)
+	Core.update_display_size(width, height)
 end
 
 function M.update(dt)

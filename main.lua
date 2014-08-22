@@ -67,6 +67,10 @@ function love.focus(f)
 	Core.focus_changed(f)
 end
 
+function love.resize(width, height)
+	Core.display_resized(width, height)
+end
+
 -- Replace love.run() to use fixed timestep
 function love.run()
 	-- Seed RNG
