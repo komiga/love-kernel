@@ -40,7 +40,6 @@ end
 function M.update_display_size(width, height)
 	Core.display_size = Vec2(width, height)
 	Core.display_size_half = Core.display_size * 0.5
-	log_traced("Core.update_display_size: %s, %s", Core.display_size, Core.display_size_half)
 end
 
 function M.init(args)
