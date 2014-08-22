@@ -127,7 +127,7 @@ function M.deinit()
 	Scene.clear()
 end
 
-function M.exit()
+function M.quit()
 	Core.deinit()
 	return true
 end
