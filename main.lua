@@ -60,7 +60,8 @@ function love.draw()
 end
 
 function love.quit()
-	return not Core.quit()
+	Core.on_quit()
+	return false
 end
 
 function love.focus(f)

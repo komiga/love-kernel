@@ -27,7 +27,7 @@ M.data.bind_table = Bind.redefine_group(M.data.bind_table, {
 		on_release = true,
 		passthrough = false,
 		handler = function(_, _, _, _)
-			Event.quit()
+			Core.quit()
 		end
 	},
 	["mouse1"] = {

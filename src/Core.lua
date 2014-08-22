@@ -134,8 +134,11 @@ function M.deinit()
 end
 
 function M.quit()
+	Event.quit()
+end
+
+function M.on_quit()
 	Core.deinit()
-	return true
 end
 
 function M.pause(paused)
