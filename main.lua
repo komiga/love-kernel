@@ -11,6 +11,7 @@ HID = {
 }
 
 require("src/State")
+require("src/Util")
 require("src/Math")
 require("src/Core")
 
@@ -75,18 +76,17 @@ function love.run()
 
 	love.load(love.arg)
 
+    local update_freq = 1.0 / 60.0
+    local render_freq = 1 / 60.0
+    local render_freq_low = 1 / 15.0
+	local update_time = 0
+	local render_time = 0
+	local current_time = 0
 	local base_time = Timer.getTime()
-	local sim_time = 0
-    local frame_time = 1.0 / 60.0
-
+	local do_render = false
 	while true do
-		local update_screen = false
-	    local current_time = Timer.getTime() - base_time
-
-		while sim_time <= current_time do
-			update_screen = true
-			HID.Mouse.pos:set(HID.Mouse.getX(), HID.Mouse.getY())
-
+	    current_time = Timer.getTime() - base_time
+		while update_time <= current_time do
 			Event.pump()
 			for event, a, b, c, d in Event.poll() do
 				if "quit" == event then
@@ -101,11 +101,17 @@ function love.run()
 			end
 			Event.clear()
 
-			love.update(frame_time)
-			sim_time = current_time + frame_time
+			HID.Mouse.pos:set(HID.Mouse.getX(), HID.Mouse.getY())
+			love.update(update_freq)
+			update_time = current_time + update_freq
+		end
+		if render_time <= current_time then
+			render_time = current_time + ternary(love.window.hasFocus(), render_freq, render_freq_low)
+			do_render = true
 		end
 
-		if update_screen then
+		if do_render then
+			do_render = false
 			love.draw()
 		end
 		Timer.sleep(0.001)
